@@ -1,19 +1,20 @@
 #include "ccapteuri2clm76_temp.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no) :
+CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned char addr) :
     QThread(parent)
 {
     int res;
 
     mNum = no;  // numéro de la mesure du fichier config.ini
+    mAddr = addr;
 
     unsigned char buf=0;
-    i2c = CI2c::getInstance(this, '1', 0x48);  // N° du fichier virtuel et adr du composant I2C
+    i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
     res = i2c->init();
     if (res == -1)
-        qDebug("Pb init I2C");
-    res = i2c->ecrire(&buf, 1);
+        qDebug("CCapteurI2cLm76_Temp: Pb init I2C");
+    res = i2c->ecrire(mAddr, &buf, 1);
     if (res != 1) qDebug("pb ecriture");
 
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
@@ -27,6 +28,7 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no) :
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 {
+    i2c->freeInstance();
     mShm->detach();
     delete mShm;
 } // destructeur
@@ -37,7 +39,7 @@ void CCapteurI2cLm76_Temp::run()
     while(1) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesure = lireMesure();
-        char chMes[10];
+        char chMes[15];
         sprintf(chMes,"%3.1f",mesure);
         mShm->lock(); // on prend la mémoire partagée
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
@@ -54,14 +56,12 @@ float CCapteurI2cLm76_Temp::lireMesure()
     char aff[10];
     int res;
 
-    res = i2c->lire(mes, 2);
+    res = i2c->lire(mAddr, mes, 2);
 
     unsigned char msb = mes[0];
     unsigned char lsb = mes[1];
-    sprintf(aff,"res=%d %02X %02X",res, msb, lsb);
+    sprintf(aff,"Temp res=%d msb=%02X lsb=%02X",res, msb, lsb);
     qDebug(aff);
-
-
     temp = ((((msb&0x7F)<<8) | lsb) >> 3)*0.0625;  // conversion
     if(msb&0x80) temp-= temp;  // si signe négatif
     return temp;

@@ -14,15 +14,15 @@ class CI2c : public QObject
 
 public:
     // creation destruction de l'objet
-    static CI2c *getInstance(QObject *parent = 0, char no = '1', int addr = 0x48);
+    static CI2c *getInstance(QObject *parent = 0, char no = '1');
     static void freeInstance();
-    int lire(unsigned char *buffer, int lg);
-    int ecrire(unsigned char *buffer, int lg);
+    int lire(unsigned char addr, unsigned char *buffer, int lg);
+    int ecrire(unsigned char addr, unsigned char *buffer, int lg);
     int init();
     int getNbLink();
 
 private:
-    explicit CI2c(QObject *parent = 0, char noBus = '1', int addr = 0x48);
+    explicit CI2c(QObject *parent = 0, char noBus = '1');
     int mAddr;   // Adresse du composant I2C
     char mNoBus;   // No d'accès au fichier /dev
     int mFileI2c;  // descripteur du fichier i2C

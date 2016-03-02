@@ -16,7 +16,7 @@ typedef struct {
     char nomMes[50];        // nom de la mesure
     char symbUnit[11];      // Symbole de l'unité de la mesure
     char textUnit[50];      // Texte de l'unité
-    char valMes[11];        // Valeur instantannée de la mesure
+    char valMes[15];        // Valeur instantannée de la mesure
 } T_Mes;
 
 #endif // GLOBAL_H

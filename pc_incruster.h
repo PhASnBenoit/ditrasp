@@ -8,7 +8,7 @@
 #include "global.h"
 
 typedef struct {
-    char texte[10]; // ce champs doit rester en premier !
+    char texte[15]; // ce champs doit rester en premier !
     int c,r;  // column, row
 } T_Aff;
 

@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     cspi.cpp \
     ccapteuri2clm76_temp.cpp \
     cdevicespimax7456.cpp \
-    ci2c.cpp
+    ci2c.cpp \
+    ccapteuri2chmc5883_comp.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -35,6 +36,7 @@ HEADERS  += mainwindow.h \
     cspi.h \
     ccapteuri2clm76_temp.h \
     cdevicespimax7456.h \
-    ci2c.h
+    ci2c.h \
+    ccapteuri2chmc5883_comp.h
 
 FORMS    += mainwindow.ui

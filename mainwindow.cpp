@@ -57,7 +57,13 @@ MainWindow::MainWindow(QWidget *parent) :
             inconnu = false;                           // la mesure est connue
             nbMesure++;
         } // if STH15
-        // USAGE ULTERIEUR
+        if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHmc5883_Comp", sizeof("CCapteurSTH15_Temp"))) {
+            qDebug("Capteur Compas HMC5883 reconnu !");
+            capteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
+            capteurs.at(i)->start();                   // lancement du thread
+            inconnu = false;                           // la mesure est connue
+            nbMesure++;
+        } // if STH15        // USAGE ULTERIEUR
 /*        if (!strncmp(mesures.at(i).nomClasse, "CCapteurSTH15_Hum", sizeof("CCapteurSTH15_Hum"))) {
             qDebug("Capteur STH15 Hum reconnu !");
             capteurs.append(new CCapteurSTH15_Hum(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé

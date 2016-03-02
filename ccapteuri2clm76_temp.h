@@ -17,9 +17,10 @@ private :
     T_Mes *mData;   // pointeur du segment de mémoire partagé
     float lireMesure();
     CI2c *i2c;
+    unsigned char mAddr;
 
 public:
-    explicit CCapteurI2cLm76_Temp(QObject *parent = 0, int no = 0); // no de la mesure définit dans le fichier de config "config.ini"
+    explicit CCapteurI2cLm76_Temp(QObject *parent = 0, int no = 0, unsigned char addr = 0x48); // no de la mesure définit dans le fichier de config "config.ini"
     ~CCapteurI2cLm76_Temp();
     void run();  // méthode virtuelle à implémenter, contenu du thread
 
