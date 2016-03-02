@@ -14,7 +14,7 @@ class CI2c : public QObject
 
 public:
     // creation destruction de l'objet
-    static CI2c *getInstance(QObject *parent, char no, int addr);
+    static CI2c *getInstance(QObject *parent = 0, char no = '1', int addr = 0x48);
     static void freeInstance();
     int lire(unsigned char *buffer, int lg);
     int ecrire(unsigned char *buffer, int lg);
@@ -29,6 +29,5 @@ private:
     int mNbLink;
     static CI2c *mSingleton;
 };
-
 
 #endif // CI2C_H

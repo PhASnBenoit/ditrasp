@@ -6,19 +6,19 @@ CI2c::CI2c(QObject *parent, char noBus, int addr) :
     mNoBus = noBus;
     mAddr = addr;
     mNbLink=0;
-}
+} // constructeur
 
 CI2c * CI2c::mSingleton = NULL;
 
 int CI2c::lire(unsigned char *buffer, int lg)
 {
     return read(mFileI2c, buffer, lg);
-}
+} // lire
 
 int CI2c::ecrire(unsigned char *buffer, int lg)
 {
     return write(mFileI2c, buffer, lg);
-}
+} // ecrire
 
 int CI2c::init()
 {
@@ -33,12 +33,12 @@ int CI2c::init()
         return -1;
     } // if ioctl
     return mFileI2c;
-}
+} // init
 
 int CI2c::getNbLink()
 {
     return mNbLink;
-}
+} // getNbLink
 
 CI2c *CI2c::getInstance(QObject *parent, char no, int addr)
 {

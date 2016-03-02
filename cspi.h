@@ -17,20 +17,21 @@ class CSpi : public QObject
     Q_OBJECT
 
 public:
-    explicit CSpi(QObject *parent = 0, char noCe = 0);
+    // creation destruction de l'objet
+    static CSpi *getInstance(QObject *parent = 0, char noCe = '0');
+    static void freeInstance();
     int lire(unsigned char *buffer, int lg);
     int ecrire(unsigned char *buffer, int lg);
     int init();
+    int getNbLink();
 
 private:
-    int mAddr;   // Adresse du composant I2C
+    explicit CSpi(QObject *parent = 0, char noCe = 0);
+    int mAddr;   // Adresse du composant SPI
     char mNoCe;   // No du device CE0 ou CE1
     int mFileSpi;  // descripteur du fichier i2C
-
-signals:
-
-public slots:
-
+    int mNbLink;
+    static CSpi *mSingleton;
 };
 
 #endif // CSPI_H

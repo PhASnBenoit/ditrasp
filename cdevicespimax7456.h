@@ -2,6 +2,7 @@
 #define CDEVICESPIMAX7456_H
 
 #include <QObject>
+#include "cspi.h"
 
 class CDeviceSpiMax7456 : public QObject
 {
