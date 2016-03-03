@@ -49,6 +49,7 @@ CI2c *CI2c::getInstance(QObject *parent, char no)
     {
         qDebug("L'objet CI2c sera créé !");
         mSingleton =  new CI2c(parent, no);
+        mSingleton->init();
         mSingleton->mNbLink++;
     }
     else
@@ -64,6 +65,7 @@ void CI2c::freeInstance()
       {
             mSingleton->mNbLink--;
             if (mSingleton->mNbLink==0) {
+                close(mSingleton->mFileI2c);
                 delete mSingleton;
                 mSingleton = NULL;
             } // if mNbLink

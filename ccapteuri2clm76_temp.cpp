@@ -11,8 +11,7 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
 
     unsigned char buf=0;
     i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
-    res = i2c->init();
-    if (res == -1)
+    if (i2c == NULL)
         qDebug("CCapteurI2cLm76_Temp: Pb init I2C");
     res = i2c->ecrire(mAddr, &buf, 1);
     if (res != 1) qDebug("pb ecriture");

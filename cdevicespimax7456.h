@@ -17,7 +17,7 @@ private:
     CSpi *spi;
 
 public:
-    explicit CDeviceSpiMax7456(QObject *parent = 0, int no = 0);
+    explicit CDeviceSpiMax7456(QObject *parent = 0, int noCe = 0);
 
 signals:
 

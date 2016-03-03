@@ -11,8 +11,7 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
     mAddrR = mAddrW+1;  // adresse pour la lecture
 
     i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel et adr du composant I2C
-    res = i2c->init();
-    if (res == -1)
+    if (i2c == NULL)
         qDebug("CCapteurI2cHmc5883_Comp: Pb init I2C");
 
     // init du composant I2C
