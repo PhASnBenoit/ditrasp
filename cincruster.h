@@ -1,14 +1,15 @@
-#ifndef PC_INCRUSTER_H
-#define PC_INCRUSTER_H
+#ifndef CINCRUSTER_H
+#define CINCRUSTER_H
 
 #include <QObject>
 #include <QTimer>
 #include <stdio.h>
 #include "cmsg.h"
 #include "global.h"
+#include "cdevicespimax7456.h"
 
 typedef struct {
-    char texte[15]; // ce champs doit rester en premier !
+    char texte[30]; // ce champs doit rester en premier !
     int c,r;  // column, row
 } T_Aff;
 
@@ -24,13 +25,13 @@ typedef struct {
     T_Aff bd;
 } T_AffInc;
 
-class PC_Incruster : public QObject
+class CIncruster : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PC_Incruster(QObject *parent = 0, CMsg *msg = 0, int interval = 1000);
-    ~PC_Incruster();
+    explicit CIncruster(QObject *parent = 0, CMsg *msg = 0, int interval = 1000);
+    ~CIncruster();
 
 private:
     CMsg *mMsg;
@@ -40,6 +41,7 @@ private:
     int mNbCapteur;  // nbre de capteurs sur le drone
     T_AffInc mAffInc;   // affichage de l'incrustation
     T_MessInc mMessInc;  // contient les no de mesures à afficher et position
+    CDeviceSpiMax7456 *mMax;
 
     void razAff();
     void majAff();
@@ -53,4 +55,4 @@ public slots:
 
 };
 
-#endif // PC_INCRUSTER_H
+#endif // CINCRUSTER_H

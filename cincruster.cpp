@@ -1,12 +1,12 @@
-#include "pc_incruster.h"
+#include "cincruster.h"
 
-PC_Incruster::PC_Incruster(QObject *parent, CMsg *msg, int interval) :
+CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     QObject(parent)
 {
-    qDebug("PC_Incruster démarre !");
+    qDebug("CIncruster démarre !");
 
     // init des positions d'affichage
-    // amélioreren mettant les positions dans un fichier
+    // améliorer en mettant les positions dans un fichier
     mAffInc.hg.c=0; mAffInc.hg.r=1;  // ligne du haut
     mAffInc.hm.c=10; mAffInc.hm.r=1;
     mAffInc.hd.c=20; mAffInc.hd.r=1;
@@ -18,6 +18,9 @@ PC_Incruster::PC_Incruster(QObject *parent, CMsg *msg, int interval) :
     mAffInc.bg.c=0; mAffInc.bg.r=15;   // ligne du bas
     mAffInc.bm.c=10; mAffInc.bm.r=15;
     mAffInc.bd.c=20; mAffInc.bd.r=15;
+
+    // instanciation du composant d'incrustation
+    mMax = new CDeviceSpiMax7456(this, '1', 250000);
 
     // attachement au segment de mémoire partagé pour les mesures instantanées
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
@@ -40,7 +43,7 @@ PC_Incruster::PC_Incruster(QObject *parent, CMsg *msg, int interval) :
 
     // envoi du message pour mise à jour de l'affichage
     mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal capté par ce même objet
-    qDebug("PC_Incruster envoi d'un message!");
+    qDebug("CIncruster envoi d'un message!");
 
     // démarrage du raffraichissement des valeurs incrustées
     mTimer = new QTimer(this);
@@ -49,15 +52,16 @@ PC_Incruster::PC_Incruster(QObject *parent, CMsg *msg, int interval) :
     mTimer->start();
 } // constructeur
 
-PC_Incruster::~PC_Incruster()
+CIncruster::~CIncruster()
 {
    mTimer->stop();
    delete mTimer;
+   delete mMax;
    mShm->detach();
    delete mShm;
 }
 
-void PC_Incruster::razAff()
+void CIncruster::razAff()
 {
     int *pNoMes = &mMessInc.hg;
     for (int i=0 ; i<NBMAXCAPT ; i++) {
@@ -65,7 +69,7 @@ void PC_Incruster::razAff()
     } // for
 }
 
-void PC_Incruster::majAff()
+void CIncruster::majAff()
 {
     int *pI = &mMessInc.hg;
     T_Aff *pA = &mAffInc.hg;
@@ -75,25 +79,27 @@ void PC_Incruster::majAff()
             strcpy(pA->texte, mData[*pI].valMes);  // LOCK/UNLOCK SI PB AFFICHAGE
             strcat(pA->texte, mData[*pI].symbUnit);
             qDebug(pA->texte);
+
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
         pI++;  // pointe sur l'int suivant dans la structure message
     } // for
 } // destructeur
 
-void PC_Incruster::onMessReady(long type)
+void CIncruster::onMessReady(long type)
 {
     int res;
 
     qDebug("PC_Incruste : Un message est arrivé");
     switch (type) {
     case TYPE_MESS_INCRUSTER:  // modification des paramètres à afficher
-        qDebug("Message reçu dans pc_incruster !!! Good !");
+        qDebug("pc_incruster: nouveaux params d'incrustation");
         res =  mMsg->getMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // lecture du message arrivé
         if (res < 0)
            qDebug("Erreur extraction du message !");
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
+        qDebug("pc_incruster: nouveaux params timer");
         T_MessIntTimer mess;
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
         mTimer->stop();
@@ -101,12 +107,12 @@ void PC_Incruster::onMessReady(long type)
         mTimer->start();
         break;
     default:
-        qDebug("PC_Incruster : Signal non destiné");
+        qDebug("CIncruster : Signal non destiné");
         break;
     } // sw
 } // onMessReady
 
-void PC_Incruster::onTimer()
+void CIncruster::onTimer()
 {
     // lire dans la shm les mesures en fonction de ce qu'il faut incruster
     majAff();

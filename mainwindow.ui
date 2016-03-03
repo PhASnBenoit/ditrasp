@@ -17,21 +17,21 @@
    <widget class="QPushButton" name="pbLireMessage">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
+      <x>150</x>
+      <y>230</y>
       <width>451</width>
       <height>71</height>
      </rect>
     </property>
     <property name="text">
-     <string>Lire le message</string>
+     <string>Emettre ordre Gopro</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="teTexte">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>380</y>
+      <x>60</x>
+      <y>430</y>
       <width>641</width>
       <height>401</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>140</y>
+      <x>160</x>
+      <y>10</y>
       <width>251</width>
       <height>39</height>
      </rect>
@@ -53,14 +53,27 @@
    <widget class="QLabel" name="lTemp">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>140</y>
+      <x>400</x>
+      <y>10</y>
       <width>154</width>
       <height>39</height>
      </rect>
     </property>
     <property name="text">
      <string>no temp !</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leOrdre">
+    <property name="geometry">
+     <rect>
+      <x>82</x>
+      <y>140</y>
+      <width>641</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>/camera/BS?t=goprohero&amp;p=%00</string>
     </property>
    </widget>
   </widget>

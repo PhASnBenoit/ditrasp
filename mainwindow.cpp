@@ -84,11 +84,11 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start();
 
     // création des objets et connexions à la file des messages
-    pc_inc = new PC_Incruster(this, msg, 500); // 500 ms d'actualisation de l'incrustation
+    pc_inc = new CIncruster(this, msg, 500); // 500 ms d'actualisation de l'incrustation
     connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
-    pc_contcam = new PC_ControlerCamera(this, msg);
+    pc_contcam = new CControlerCamera(this, msg);
     connect(msg, SIGNAL(mailReady(long)), pc_contcam, SLOT(onMessReady(long)));
-    pc_com = new PC_Communiquer(this, msg);
+    pc_com = new CCommuniquer(this, msg);
     connect(msg, SIGNAL(mailReady(long)), pc_com, SLOT(onMessReady(long)));
 } // constructeur
 
@@ -119,10 +119,9 @@ void MainWindow::onMessReady(long type)
 
 void MainWindow::on_pbLireMessage_clicked()
 {
-    // essai d'envoi de message
-        T_MessMes mess;
-        mess.corps.valInt = 1234;
-        msg->sendMessage(TYPE_MESS_MESURE,&mess, sizeof(T_MessMes));
+    T_MessOrdre ordre;
+    strncpy(ordre.ordre, ui->leOrdre->text().toStdString().c_str(), sizeof(ordre.ordre));
+    msg->sendMessage(TYPE_MESS_ORDRE_CAMERA, &ordre, sizeof(ordre));
 }
 
 void MainWindow::onTimer()

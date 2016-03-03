@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,27 +16,27 @@ INSTALLS += target
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    pc_communiquer.cpp \
-    pc_controlercamera.cpp \
-    pc_incruster.cpp \
     cmsg.cpp \
     cspi.cpp \
     ccapteuri2clm76_temp.cpp \
     cdevicespimax7456.cpp \
     ci2c.cpp \
-    ccapteuri2chmc5883_comp.cpp
+    ccapteuri2chmc5883_comp.cpp \
+    ccontrolercamera.cpp \
+    ccommuniquer.cpp \
+    cincruster.cpp
 
 
 HEADERS  += mainwindow.h \
-    pc_communiquer.h \
-    pc_controlercamera.h \
-    pc_incruster.h \
     cmsg.h \
     global.h \
     cspi.h \
     ccapteuri2clm76_temp.h \
     cdevicespimax7456.h \
     ci2c.h \
-    ccapteuri2chmc5883_comp.h
+    ccapteuri2chmc5883_comp.h \
+    ccontrolercamera.h \
+    ccommuniquer.h \
+    cincruster.h
 
 FORMS    += mainwindow.ui

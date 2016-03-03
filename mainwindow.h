@@ -11,9 +11,9 @@
 #include "ci2c.h"
 #include "ccapteuri2clm76_temp.h"
 #include "ccapteuri2chmc5883_comp.h"
-#include "pc_communiquer.h"
-#include "pc_controlercamera.h"
-#include "pc_incruster.h"
+#include "ccommuniquer.h"
+#include "ccontrolercamera.h"
+#include "cincruster.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,9 +31,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    PC_Communiquer *pc_com;
-    PC_Incruster *pc_inc;
-    PC_ControlerCamera *pc_contcam;
+    CCommuniquer *pc_com;
+    CIncruster *pc_inc;
+    CControlerCamera *pc_contcam;
     QList<QThread *> capteurs;   // tableau de thread des capteurs
     QTimer *timer;
     int nbMesure;

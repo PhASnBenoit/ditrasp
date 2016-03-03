@@ -1,5 +1,5 @@
-#ifndef PC_COMMUNIQUER_H
-#define PC_COMMUNIQUER_H
+#ifndef CCOMMUNIQUER_H
+#define CCOMMUNIQUER_H
 
 #include <QObject>
 //#include <QSerialPortInfo>
@@ -7,12 +7,12 @@
 #include <stdio.h>
 #include "cmsg.h"
 
-class PC_Communiquer : public QObject
+class CCommuniquer : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit PC_Communiquer(QObject *parent = 0, CMsg *msg = 0);
+    explicit CCommuniquer(QObject *parent = 0, CMsg *msg = 0);
 
 private:
     CMsg *pMsg;
@@ -28,4 +28,4 @@ public slots:
 
 };
 
-#endif // PC_COMMUNIQUER_H
+#endif // CCOMMUNIQUER_H
