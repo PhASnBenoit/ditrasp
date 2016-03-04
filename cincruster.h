@@ -10,7 +10,7 @@
 
 typedef struct {
     char texte[30]; // ce champs doit rester en premier !
-    int c,r;  // column, row
+    int r,c;  // column, row
 } T_Aff;
 
 typedef struct {

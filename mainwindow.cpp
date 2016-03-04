@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
         } // if 5883        // USAGE ULTERIEUR
         // TO DO Here : autre définition des capteurs
 
-        if (inconnu)
+        if (inconnu==true)
             qDebug("Classe du capteur inconnu !");
         data++; // on passe à l'espace mémoire suivant
     } // for
@@ -107,9 +107,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::onMessReady(long type)
 {
-    QMessageBox::warning(0, tr("Attention : Message recu"),
-                         tr("Le message de type ")+QString::number(type)+
-                         tr(" est dans la file de message."), QMessageBox::Ok);
+  //  QMessageBox::warning(0, tr("Attention : Message recu"),
+  //                       tr("Le message de type ")+QString::number(type)+
+  //                       tr(" est dans la file de message."), QMessageBox::Ok);
 } // onMessReady
 
 void MainWindow::on_pbLireMessage_clicked()
@@ -128,14 +128,23 @@ void MainWindow::on_pbLireMessage_clicked()
 void MainWindow::onTimer()
 {
     T_Mes *data = (T_Mes *)shm->constData();
-    QString unite;
     shm->lock();
     for(int i=0 ; i<nbMesure ; i++) {
-        if (!strncmp(data[i].nomClasse,"CCapteurSTH15_Temp",sizeof("CCapteurSTH15_Temp"))) {
-            //unite=QString("°C");
-            ui->lTemp->setText(QString(data[i].valMes));
-            ui->lTemp->setText(ui->lTemp->text()+unite);
-        } // if
+        switch(i) {
+        case 0: ui->lCapteur1->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 1: ui->lCapteur2->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 2: ui->lCapteur3->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 3: ui->lCapteur4->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 4: ui->lCapteur5->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 5: ui->lCapteur6->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 6: ui->lCapteur7->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 7: ui->lCapteur8->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 8: ui->lCapteur9->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        case 9: ui->lCapteur10->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
+        default:
+            ui->teTexte->append("ATTENTION, dépassement de mesure...");
+            break;
+        } // sw
     } // for
     shm->unlock();
 } // onTimer

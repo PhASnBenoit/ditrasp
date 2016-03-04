@@ -15,7 +15,8 @@ int CI2c::lire(unsigned char addr,  unsigned char *buffer, int lg)
         qDebug("Erreur ioctl acces au bus I2C");
         return -1;
     } // if ioctl
-    return read(mFileI2c, buffer, lg);
+    int nb=read(mFileI2c, buffer, lg);
+    return nb;
 } // lire
 
 int CI2c::ecrire(unsigned char addr, unsigned char *buffer, int lg)
@@ -24,7 +25,8 @@ int CI2c::ecrire(unsigned char addr, unsigned char *buffer, int lg)
         qDebug("Erreur ioctl acces au bus I2C");
         return -1;
     } // if ioctl
-    return write(mFileI2c, buffer, lg);
+    int nb=write(mFileI2c, buffer, lg);
+    return nb;
 } // ecrire
 
 int CI2c::init()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>781</width>
-    <height>930</height>
+    <width>1250</width>
+    <height>1273</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>90</y>
+      <y>400</y>
       <width>451</width>
       <height>71</height>
      </rect>
@@ -30,44 +30,31 @@
    <widget class="QTextEdit" name="teTexte">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>260</y>
-      <width>641</width>
+      <x>20</x>
+      <y>600</y>
+      <width>1191</width>
       <height>571</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lCapteur1">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>10</y>
-      <width>251</width>
+      <x>20</x>
+      <y>20</y>
+      <width>581</width>
       <height>39</height>
      </rect>
     </property>
     <property name="text">
-     <string>Température :</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lTemp">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>10</y>
-      <width>154</width>
-      <height>39</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>no temp !</string>
+     <string>Pas de capteur pour le moment !</string>
     </property>
    </widget>
    <widget class="QComboBox" name="cbRep">
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>190</y>
+      <y>500</y>
       <width>176</width>
       <height>48</height>
      </rect>
@@ -87,7 +74,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>190</y>
+      <y>500</y>
       <width>241</width>
       <height>48</height>
      </rect>
@@ -152,7 +139,7 @@
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>190</y>
+      <y>500</y>
       <width>131</width>
       <height>48</height>
      </rect>
@@ -192,7 +179,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>190</y>
+      <y>500</y>
       <width>21</width>
       <height>39</height>
      </rect>
@@ -205,7 +192,7 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>190</y>
+      <y>500</y>
       <width>51</width>
       <height>39</height>
      </rect>
@@ -218,7 +205,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>190</y>
+      <y>500</y>
       <width>21</width>
       <height>39</height>
      </rect>
@@ -227,13 +214,130 @@
      <string>/</string>
     </property>
    </widget>
+   <widget class="QLabel" name="lCapteur2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>220</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur6">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>20</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur7">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>70</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur8">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>120</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur9">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>170</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lCapteur10">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>220</y>
+      <width>581</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pas de capteur pour le moment !</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>781</width>
+     <width>1250</width>
      <height>45</height>
     </rect>
    </property>

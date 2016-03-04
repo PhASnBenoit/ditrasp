@@ -43,6 +43,7 @@ void CCapteurI2cLm76_Temp::run()
         mShm->lock(); // on prend la mémoire partagée
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
+        qDebug(chMes);
         sleep(1);
     } // while
 } // run
@@ -52,7 +53,7 @@ float CCapteurI2cLm76_Temp::lireMesure()
 {
     float temp;
     unsigned char mes[2];
-    char aff[10];
+    char aff[50];
     int res;
 
     res = i2c->lire(mAddr, mes, 2);

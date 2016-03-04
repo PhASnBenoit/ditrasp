@@ -67,7 +67,7 @@ void CIncruster::razAff()
     for (int i=0 ; i<NBMAXCAPT ; i++) {
         *pNoMes++=-1;  // init de tout l'affichage à -1 donc pas d'affichage
     } // for
-}
+} // razAff
 
 void CIncruster::majAff()
 {
@@ -79,12 +79,12 @@ void CIncruster::majAff()
             strcpy(pA->texte, mData[*pI].valMes);  // LOCK/UNLOCK SI PB AFFICHAGE
             strcat(pA->texte, mData[*pI].symbUnit);
             qDebug(pA->texte);
-
+            mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
         pI++;  // pointe sur l'int suivant dans la structure message
     } // for
-} // destructeur
+} // majAff
 
 void CIncruster::onMessReady(long type)
 {
@@ -114,6 +114,11 @@ void CIncruster::onMessReady(long type)
 
 void CIncruster::onTimer()
 {
+    /*
+    unsigned char ch[4]={0};
+    mMax->lireSpi(ch,4);
+    qDebug((char *)ch);
+    */
     // lire dans la shm les mesures en fonction de ce qu'il faut incruster
-    majAff();
+    //majAff();
 } // onTimer
