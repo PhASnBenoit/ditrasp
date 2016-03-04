@@ -114,6 +114,7 @@ void CControlerCamera::onReadyRead()
 void CControlerCamera::onConnected()
 {
     qDebug("Connected to the Gopro");
+    qDebug("2Connected to the Gopro");
 } // onConnected
 
 void CControlerCamera::onDisconnected()
