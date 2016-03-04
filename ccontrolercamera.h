@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "cmsg.h"
 
+/*
 #define ON "01"
 #define OFF "00"
 #define START "01"
@@ -43,7 +44,7 @@
 #define ARRET "00"
 #define V70POURCENT "01"
 #define V100POURCENT "02"
-
+*/
 /////////////////////////////////////////////////////////////////////
 class CControlerCamera : public QObject
 {
@@ -78,7 +79,7 @@ private slots:
     void onReadyRead();
     void onConnected();
     void onDisconnected();
-    void onBytesWritten(quint64 nb);
+    void onBytesWritten(qint64 nb);
 
 public slots:
 

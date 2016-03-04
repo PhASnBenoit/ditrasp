@@ -50,28 +50,22 @@ MainWindow::MainWindow(QWidget *parent) :
     for(int i=0 ; i<nbLigne ; i++) {
         bool inconnu=true;                          // le capteur par défaut n'est pas reconnu
         memcpy(data, &mesures.at(i), sizeof(T_Mes));
-        if (!strncmp(mesures.at(i).nomClasse, "CCapteurSTH15_Temp", sizeof("CCapteurSTH15_Temp"))) {
-            qDebug("Capteur STH15 Temp reconnu !");
+        if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cLm76_Temp", sizeof("CCapteurI2cLm76_Temp"))) {
+            qDebug("Capteur LM76 Temp reconnu !");
             capteurs.append(new CCapteurI2cLm76_Temp(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
             capteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
             nbMesure++;
-        } // if STH15
-        if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHmc5883_Comp", sizeof("CCapteurSTH15_Temp"))) {
+        } // if LM76
+        if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHmc5883_Comp", sizeof("CCapteurI2cHmc5883_Comp"))) {
             qDebug("Capteur Compas HMC5883 reconnu !");
             capteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
             capteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
             nbMesure++;
-        } // if STH15        // USAGE ULTERIEUR
-/*        if (!strncmp(mesures.at(i).nomClasse, "CCapteurSTH15_Hum", sizeof("CCapteurSTH15_Hum"))) {
-            qDebug("Capteur STH15 Hum reconnu !");
-            capteurs.append(new CCapteurSTH15_Hum(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
-            capteurs.at(i)->start();                   // lancement du thread
-            inconnu = false;                           // la mesure est connue
-            nbMesure++;
-        } // if STH15
-*/        // TO DO Here : autre définition des capteurs
+        } // if 5883        // USAGE ULTERIEUR
+        // TO DO Here : autre définition des capteurs
+
         if (inconnu)
             qDebug("Classe du capteur inconnu !");
         data++; // on passe à l'espace mémoire suivant
@@ -84,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->start();
 
     // création des objets et connexions à la file des messages
+    connect(msg, SIGNAL(mailReady(long)), this, SLOT(onMessReady(long)));
     pc_inc = new CIncruster(this, msg, 500); // 500 ms d'actualisation de l'incrustation
     connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
     pc_contcam = new CControlerCamera(this, msg);
@@ -108,21 +103,27 @@ MainWindow::~MainWindow()
     delete msg;
     delete ui;
     //delete msg;
-}
+} // destructeur
 
 void MainWindow::onMessReady(long type)
 {
-    QMessageBox::warning(0, tr("Attention : Message envoyé"),
+    QMessageBox::warning(0, tr("Attention : Message recu"),
                          tr("Le message de type ")+QString::number(type)+
                          tr(" est dans la file de message."), QMessageBox::Ok);
-}
+} // onMessReady
 
 void MainWindow::on_pbLireMessage_clicked()
 {
     T_MessOrdre ordre;
-    strncpy(ordre.ordre, ui->leOrdre->text().toStdString().c_str(), sizeof(ordre.ordre));
+    strcpy(ordre.ordre,"GET /");
+    strcat(ordre.ordre, ui->cbRep->currentText().toStdString().c_str());
+    strcat(ordre.ordre, "/");
+    strcat(ordre.ordre, ui->cbApp->currentText().toStdString().c_str());
+    strcat(ordre.ordre,"?t=goprohero&p=");
+    strcat(ordre.ordre, ui->cbVal->currentText().toStdString().c_str());
+    strcat(ordre.ordre, "\r\n\r\n"); // fin d'entête requête HTTP
     msg->sendMessage(TYPE_MESS_ORDRE_CAMERA, &ordre, sizeof(ordre));
-}
+} // onLireMessage
 
 void MainWindow::onTimer()
 {
@@ -137,4 +138,4 @@ void MainWindow::onTimer()
         } // if
     } // for
     shm->unlock();
-}
+} // onTimer

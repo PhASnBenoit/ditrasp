@@ -11,7 +11,7 @@ CControlerCamera::CControlerCamera(QObject *parent, CMsg *msg) :
     connect(mSock, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(mSock, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(mSock, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    connect(mSock, SIGNAL(bytesWritten(qint64)), SLOT(onBytesWritten(quint64)));
+    connect(mSock, SIGNAL(bytesWritten(qint64)), SLOT(onBytesWritten(qint64)));
 
     pMsg = msg;
     qDebug("CControlerCamera démarre !");
@@ -94,8 +94,12 @@ void CControlerCamera::onMessReady(long type)
            qDebug("Erreur extraction du message !");
         mSock->connectToHost(mAdrIP,mPort);
         mSock->write(mess.ordre);
+        //mSock->close();
         qDebug(mess.ordre);
         break;
+    default:
+        qDebug("CControlerCamera: Message non reconnu reçu !");
+
     } // sw
 } // onMessReady
 
@@ -104,7 +108,7 @@ void CControlerCamera::onReadyRead()
     QByteArray qba;
     qba = mSock->readAll(); // lecture de l'octet de réponse (=0)
     qDebug("Acquittement de l'ordre par la Gopro");
-    mSock->disconnectFromHost();
+    mSock->close();
 } // onReadyRead
 
 void CControlerCamera::onConnected()
@@ -117,7 +121,8 @@ void CControlerCamera::onDisconnected()
     qDebug("Disconnected from the Gopro");
 } // onDisconnected
 
-void CControlerCamera::onBytesWritten(quint64 nb)
+void CControlerCamera::onBytesWritten(qint64 nb)
 {
     qDebug("L'ordre a été transmis à la Gopro");
+    qDebug(QString::number(nb).toStdString().c_str());
 } // onBytesWritten
