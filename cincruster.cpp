@@ -78,7 +78,8 @@ void CIncruster::majAff()
         if (*pI != -1) {
             strcpy(pA->texte, mData[*pI].valMes);  // LOCK/UNLOCK SI PB AFFICHAGE
             strcat(pA->texte, mData[*pI].symbUnit);
-            qDebug(pA->texte);
+            strcpy(pA->texte,"SALUT");
+            qDebug() << pA->texte;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
@@ -120,5 +121,5 @@ void CIncruster::onTimer()
     qDebug((char *)ch);
     */
     // lire dans la shm les mesures en fonction de ce qu'il faut incruster
-    //majAff();
+    majAff();
 } // onTimer

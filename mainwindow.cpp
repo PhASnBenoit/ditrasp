@@ -148,3 +148,11 @@ void MainWindow::onTimer()
     } // for
     shm->unlock();
 } // onTimer
+
+
+/*
+void MainWindow::on_pbQuitter_clicked()
+{
+    this->destroy();
+}
+*/

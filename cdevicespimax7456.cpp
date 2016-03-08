@@ -12,10 +12,22 @@ int CDeviceSpiMax7456::lireSpi(unsigned char *ch, int lg)
 int CDeviceSpiMax7456::init()
 {
     unsigned char com[2];
+    unsigned char ch;
 
     // init du composant d'incrustation
-    com[0] = VM0; com[1]=0x40;  // PAL
+    com[0] = VM0; com[1]=0x48;  // PAL
     mSpi->ecrire(com,2);
+    usleep(1000);
+    com[0] = OSDBL|READ;  // pour lecture
+    mSpi->ecrire(com,1);
+    usleep(1000);
+    mSpi->lire1octet(&ch);
+    usleep(1000);
+    com[1] = ch & 0xEF;  // mettre à 0 bit 4
+    com[0] = OSDBL;
+    mSpi->ecrire(com,2); // automatique black level
+    usleep(1000);
+
     return 1;
 }
 
@@ -23,13 +35,14 @@ CDeviceSpiMax7456::CDeviceSpiMax7456(QObject *parent, int noCe, int speed) :
     QObject(parent)
 {
     mSpi = new CSpi(this, noCe, speed);
+    init();
 
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
     if (!mShm->attach())
         qDebug(mShm->errorString().toStdString().c_str());
     mData = (T_Mes *)mShm->data(); // obtient le pointeur sur la mémoire
 
-    qDebug("Démarrage du thread CCapteurLM76_Temp !");
+    qDebug("Démarrage de l'objet CDeviceSpiMax7456 !");
 } // constructeur
 
 CDeviceSpiMax7456::~CDeviceSpiMax7456()
@@ -46,11 +59,12 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
 
     // calcul de la position dans la display memory
     int dispMemAddr = r*cMax+c;
-    (dispMemAddr>255)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
-    com[0]=DMAH; com[1]=reg;
-    mSpi->ecrire(com,2); // accès au caractère et non attribut
+    (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
 
-    com[0]=DMAH; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
+    com[0]=DMAH; com[1]=reg;
+    mSpi->ecrire(com,2); // MSB
+
+    com[0]=DMAL; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
     mSpi->ecrire(com,2); // Adresse de base d'affichage
 
     com[0]=DMM; com[1] = 0x41; // auto-increment et operation 8 bits
@@ -67,6 +81,7 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
     } // for
     com[1]=0xFF;
     mSpi->ecrire(com,2);
+
     return -1;
 } // printRC
 

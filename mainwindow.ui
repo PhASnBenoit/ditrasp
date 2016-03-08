@@ -331,6 +331,19 @@
      <string>Pas de capteur pour le moment !</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pbQuitter">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>350</y>
+      <width>215</width>
+      <height>48</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Quitter</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -354,5 +367,22 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pbQuitter</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1110</x>
+     <y>420</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>979</x>
+     <y>537</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

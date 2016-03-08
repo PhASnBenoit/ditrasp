@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QDebug>
 #include <stdio.h>
 #include "cmsg.h"
 #include "global.h"
