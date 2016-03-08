@@ -2,6 +2,7 @@
 #define CCOMMUNIQUER_H
 
 #include <QObject>
+#include <QDebug>
 //#include <QSerialPortInfo>
 //#include <QSerialPort>
 #include <stdio.h>

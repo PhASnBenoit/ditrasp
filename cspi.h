@@ -2,6 +2,7 @@
 #define CSPI_H
 
 #include <QObject>
+#include <QDebug>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>

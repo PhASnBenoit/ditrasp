@@ -11,78 +11,17 @@ CControlerCamera::CControlerCamera(QObject *parent, CMsg *msg) :
     connect(mSock, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(mSock, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(mSock, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    connect(mSock, SIGNAL(bytesWritten(qint64)), SLOT(onBytesWritten(qint64)));
 
     pMsg = msg;
+
     qDebug("CControlerCamera démarre !");
-}
+} // constructeur
 
 CControlerCamera::~CControlerCamera()
 {
-    //delete mAdrIP;
     delete mSock;
-}
-/*
-int CControlerCamera::capture(int etat)
-{
-    return 1;
+} // destructeur
 
-}
-
-int CControlerCamera::changeMode(int mode)
-{
-    return 1;
-
-}
-
-int CControlerCamera::preview(int etat)
-{
-    return 1;
-
-}
-
-int CControlerCamera::orientation(int etat)
-{
-    return 1;
-
-}
-
-int CControlerCamera::resolutionVideo(int res)
-{
-    return 1;
-
-}
-
-int CControlerCamera::resolutionPhoto(int res)
-{
-    return 1;
-
-}
-
-int CControlerCamera::timer(int interv)
-{
-    return 1;
-
-}
-
-int CControlerCamera::localisation(int etat)
-{
-    return 1;
-
-}
-
-int CControlerCamera::turn(int etat)
-{
-    QString str;
-    if (etat)
-        str="http://"+mAdrIP.toString()+"bacpac/PW?t="+mMdp+"&p=%"+QString(ON);
-    else
-        str="http://"+mAdrIP.toString()+"bacpac/PW?t="+mMdp+"&p=%"+QString(OFF);
-    mSock->connectToHost(mAdrIP,mPort);
-    mSock->write(str.toStdString().c_str());
-    return 1;
-}
-*/
 void CControlerCamera::onMessReady(long type)
 {
     int res;
@@ -99,7 +38,7 @@ void CControlerCamera::onMessReady(long type)
         break;
     default:
         qDebug("CControlerCamera: Message non reconnu reçu !");
-
+        break;
     } // sw
 } // onMessReady
 
@@ -113,8 +52,7 @@ void CControlerCamera::onReadyRead()
 
 void CControlerCamera::onConnected()
 {
-    qDebug("Connected to the Gopro");
-    qDebug("2Connected to the Gopro");
+    qDebug() << "Connected to the Gopro";
 } // onConnected
 
 void CControlerCamera::onDisconnected()
@@ -122,8 +60,3 @@ void CControlerCamera::onDisconnected()
     qDebug("Disconnected from the Gopro");
 } // onDisconnected
 
-void CControlerCamera::onBytesWritten(qint64 nb)
-{
-    qDebug("L'ordre a été transmis à la Gopro");
-    qDebug(QString::number(nb).toStdString().c_str());
-} // onBytesWritten

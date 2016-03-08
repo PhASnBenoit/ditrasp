@@ -27,7 +27,6 @@ int CDeviceSpiMax7456::init()
     com[0] = OSDBL;
     mSpi->ecrire(com,2); // automatique black level
     usleep(1000);
-
     return 1;
 }
 
@@ -35,7 +34,7 @@ CDeviceSpiMax7456::CDeviceSpiMax7456(QObject *parent, int noCe, int speed) :
     QObject(parent)
 {
     mSpi = new CSpi(this, noCe, speed);
-    init();
+    this->init(); // init du composant MAX7456
 
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
     if (!mShm->attach())
@@ -60,9 +59,8 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
     // calcul de la position dans la display memory
     int dispMemAddr = r*cMax+c;
     (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
-
     com[0]=DMAH; com[1]=reg;
-    mSpi->ecrire(com,2); // MSB
+    mSpi->ecrire(com,2); // MSB de la position d'affichage
 
     com[0]=DMAL; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
     mSpi->ecrire(com,2); // Adresse de base d'affichage
@@ -72,6 +70,7 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
 
     com[0]=DMDI;
     for (size_t i=0 ; i<strlen(mes) ; i++) {
+        com[1]=0x42; // caractère ? dans le référentiel MAX7456
         if (islower(*mes)) com[1]=*mes-0x3C; // adresse du car dans le référentiel MAX7456
         if (isupper(*mes)) com[1]=*mes-0x36;
         if (isdigit(*mes)) com[1]=*mes-0x30;
@@ -80,6 +79,9 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
         mes++; // car suivant
     } // for
     com[1]=0xFF;
+    mSpi->ecrire(com,2);
+
+    com[0]=DMM; com[1] = 0x00; // suppression auto increment et 8 bits.
     mSpi->ecrire(com,2);
 
     return -1;

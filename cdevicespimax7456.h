@@ -3,6 +3,7 @@
 
 
 #include <QObject>
+#include <QDebug>
 #include <string.h>
 #include "global.h"
 #include "cspi.h"

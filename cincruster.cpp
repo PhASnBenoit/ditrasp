@@ -71,15 +71,16 @@ void CIncruster::razAff()
 
 void CIncruster::majAff()
 {
-    int *pI = &mMessInc.hg;
-    T_Aff *pA = &mAffInc.hg;
+    int *pI = &mMessInc.hg;  // pointe sur les mesures autorisées
+    T_Aff *pA = &mAffInc.hg;  // pointe sur la structure d'incrustation
     // modifier les valeurs d'incrustation
     for (int i=0 ; i<NBMAXCAPT ; i++) { // pour tous les capteurs dans le message
         if (*pI != -1) {
-            strcpy(pA->texte, mData[*pI].valMes);  // LOCK/UNLOCK SI PB AFFICHAGE
+            mShm->lock();
+            strcpy(pA->texte, mData[*pI].valMes);  // accès à la mémoire partagée
             strcat(pA->texte, mData[*pI].symbUnit);
-            strcpy(pA->texte,"SALUT");
-            qDebug() << pA->texte;
+            mShm->unlock();
+            qDebug() << "CIncruster Mesure : " << pA->texte;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
@@ -115,11 +116,6 @@ void CIncruster::onMessReady(long type)
 
 void CIncruster::onTimer()
 {
-    /*
-    unsigned char ch[4]={0};
-    mMax->lireSpi(ch,4);
-    qDebug((char *)ch);
-    */
     // lire dans la shm les mesures en fonction de ce qu'il faut incruster
     majAff();
 } // onTimer

@@ -2,6 +2,7 @@
 #define CMSG_H
 
 #include <QObject>
+#include <QDebug>
 #include <QString>
 #include <sys/types.h>
 #include <sys/ipc.h>

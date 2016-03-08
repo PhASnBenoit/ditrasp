@@ -73,13 +73,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
      // lancement du timer de mise à jour des mesures dans l'IHM
     timer = new QTimer(this);
-    timer->setInterval(500);
+    timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start();
 
     // création des objets et connexions à la file des messages
     connect(msg, SIGNAL(mailReady(long)), this, SLOT(onMessReady(long)));
-    pc_inc = new CIncruster(this, msg, 500); // 500 ms d'actualisation de l'incrustation
+    pc_inc = new CIncruster(this, msg, 1000); // 1000ms d'actualisation de l'incrustation
     connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
     pc_contcam = new CControlerCamera(this, msg);
     connect(msg, SIGNAL(mailReady(long)), pc_contcam, SLOT(onMessReady(long)));
@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    CI2c::freeInstance();
+    CI2c::freeInstance(); // libère la mémoire du singleton
     timer->stop();
     delete timer;
     delete pc_com;
@@ -102,14 +102,12 @@ MainWindow::~MainWindow()
     msg->detruire();
     delete msg;
     delete ui;
-    //delete msg;
 } // destructeur
 
 void MainWindow::onMessReady(long type)
 {
-  //  QMessageBox::warning(0, tr("Attention : Message recu"),
-  //                       tr("Le message de type ")+QString::number(type)+
-  //                       tr(" est dans la file de message."), QMessageBox::Ok);
+    qDebug() << "MainWindow: Attention, message reçu de type " << type << " est dans la file de message.";
+
 } // onMessReady
 
 void MainWindow::on_pbLireMessage_clicked()

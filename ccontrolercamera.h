@@ -2,6 +2,7 @@
 #define CCONTROLERCAMERA_H
 
 #include <QObject>
+#include <QDebug>
 #include <QString>
 #include <QTcpSocket>
 #include <QHostAddress>
@@ -53,18 +54,7 @@ class CControlerCamera : public QObject
 public:
     explicit CControlerCamera(QObject *parent = 0, CMsg *msg = 0);
     ~CControlerCamera();
-/*
-    int turn(int etat);
-    int capture(int etat);
-    int changeMode(int mode);
-    int preview(int etat);
-    int orientation(int etat);
-    int resolutionVideo(int res);
-    int resolutionPhoto(int res);
-    int timer(int interv);
-    int localisation(int etat);
-    int volume(int niveau);
-*/
+
 private:
     CMsg *pMsg; //
     QHostAddress mAdrIP;     // adr IP de la caméra
@@ -79,7 +69,6 @@ private slots:
     void onReadyRead();
     void onConnected();
     void onDisconnected();
-    void onBytesWritten(qint64 nb);
 
 public slots:
 

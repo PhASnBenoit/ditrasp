@@ -2,6 +2,7 @@
 #define CI2C_H
 
 #include <QObject>
+#include <QDebug>
 #include <stdio.h>
 #include <unistd.h>				//Needed for I2C port
 #include <fcntl.h>				//Needed for I2C port
