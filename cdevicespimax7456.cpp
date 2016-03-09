@@ -56,33 +56,52 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
     unsigned char reg=0;
     unsigned char com[2];
 
-    // calcul de la position dans la display memory
-    int dispMemAddr = r*cMax+c;
-    (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
-    com[0]=DMAH; com[1]=reg;
-    mSpi->ecrire(com,2); // MSB de la position d'affichage
-
-    com[0]=DMAL; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
-    mSpi->ecrire(com,2); // Adresse de base d'affichage
-
-    com[0]=DMM; com[1] = 0x41; // auto-increment et operation 8 bits
+    com[0] = DMM; com[1]=0x00; // 16 bits
     mSpi->ecrire(com,2);
+    usleep(1000);
 
-    com[0]=DMDI;
-    for (size_t i=0 ; i<strlen(mes) ; i++) {
-        com[1]=0x42; // caractère ? dans le référentiel MAX7456
+    int dispMemAddr = r*cMax+c;
+    qDebug() << "CDeviceSpiMax7456 : " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
+
+    while(*mes!=0) {  // on effectue la boucle jusqu'à la fin de la chaine (caractère NULL)
+        (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
+        com[0]=DMAH; com[1]=reg;
+        mSpi->ecrire(com,2); // MSB de la position d'affichage
+        usleep(1000);
+
+        com[0]=DMAL; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
+        mSpi->ecrire(com,2); // Adresse de base d'affichage
+        usleep(1000);
+
+        com[0]=DMDI; com[1]=0x42; // caractère ? dans le référentiel MAX7456
         if (islower(*mes)) com[1]=*mes-0x3C; // adresse du car dans le référentiel MAX7456
         if (isupper(*mes)) com[1]=*mes-0x36;
         if (isdigit(*mes)) com[1]=*mes-0x30;
-        if (*mes=='0') com[1]=0x0A;
+        switch(*mes) {
+        case '0': com[1]=0x0A; break;
+        case ' ': com[1]=0x00; break;
+        case '.': com[1]=0x41; break;
+        case '(': com[1]=0x3F; break;
+        case ')': com[1]=0x40; break;
+        case ';': com[1]=0x43; break;
+        case ':': com[1]=0x44; break;
+        case ',': com[1]=0x45; break;
+        case '\'':
+        case '°':com[1]=0x46; break;
+        case '/': com[1]=0x47; break;
+        case '\"': com[1]=0x48; break;
+        case '-': com[1]=0x49; break;
+        case '<': com[1]=0x4A; break;
+        case '>': com[1]=0x4B; break;
+        case '@': com[1]=0x4C; break;
+        }; // sw
         mSpi->ecrire(com,2);
+        usleep(1000);
+        qDebug() << "caractère : " << *mes;
         mes++; // car suivant
-    } // for
-    com[1]=0xFF;
-    mSpi->ecrire(com,2);
-
-    com[0]=DMM; com[1] = 0x00; // suppression auto increment et 8 bits.
-    mSpi->ecrire(com,2);
+        dispMemAddr++;
+        qDebug() << "Après inc : " << dispMemAddr;
+    } // while
 
     return -1;
 } // printRC

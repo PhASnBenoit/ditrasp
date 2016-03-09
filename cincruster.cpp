@@ -7,7 +7,7 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
 
     // init des positions d'affichage
     // améliorer en mettant les positions dans un fichier
-    mAffInc.hg.c=0; mAffInc.hg.r=1;  // ligne du haut
+    mAffInc.hg.c=1; mAffInc.hg.r=1;  // ligne du haut
     mAffInc.hm.c=10; mAffInc.hm.r=1;
     mAffInc.hd.c=20; mAffInc.hd.r=1;
 
@@ -73,6 +73,8 @@ void CIncruster::majAff()
 {
     int *pI = &mMessInc.hg;  // pointe sur les mesures autorisées
     T_Aff *pA = &mAffInc.hg;  // pointe sur la structure d'incrustation
+    mMax->effaceEcran();
+
     // modifier les valeurs d'incrustation
     for (int i=0 ; i<NBMAXCAPT ; i++) { // pour tous les capteurs dans le message
         if (*pI != -1) {
