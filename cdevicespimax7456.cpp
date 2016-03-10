@@ -1,5 +1,19 @@
 #include "cdevicespimax7456.h"
 
+CDeviceSpiMax7456::CDeviceSpiMax7456(QObject *parent, int noCe, int speed) :
+    QObject(parent)
+{
+    mSpi = new CSpi(this, noCe, speed);
+    this->init(); // init du composant MAX7456
+    qDebug("Démarrage de l'objet CDeviceSpiMax7456 !");
+} // constructeur
+
+CDeviceSpiMax7456::~CDeviceSpiMax7456()
+{
+    delete mSpi;
+} // destructeur
+
+
 int CDeviceSpiMax7456::lireSpi(unsigned char *ch, int lg)
 {
    int i;
@@ -7,7 +21,7 @@ int CDeviceSpiMax7456::lireSpi(unsigned char *ch, int lg)
        mSpi->lire1octet(ch++);
    } // for
    return 1;
-}
+} // lireSpi
 
 int CDeviceSpiMax7456::init()
 {
@@ -28,27 +42,7 @@ int CDeviceSpiMax7456::init()
     mSpi->ecrire(com,2); // automatique black level
     usleep(1000);
     return 1;
-}
-
-CDeviceSpiMax7456::CDeviceSpiMax7456(QObject *parent, int noCe, int speed) :
-    QObject(parent)
-{
-    mSpi = new CSpi(this, noCe, speed);
-    this->init(); // init du composant MAX7456
-
-    mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
-    if (!mShm->attach())
-        qDebug(mShm->errorString().toStdString().c_str());
-    mData = (T_Mes *)mShm->data(); // obtient le pointeur sur la mémoire
-
-    qDebug("Démarrage de l'objet CDeviceSpiMax7456 !");
-} // constructeur
-
-CDeviceSpiMax7456::~CDeviceSpiMax7456()
-{
-    delete mSpi;
-    delete mShm;
-}
+} // init
 
 int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
 {
@@ -117,4 +111,4 @@ int CDeviceSpiMax7456::effaceEcran()
     mSpi->ecrire(com,2);
     usleep(20);  // temps d'effacement
     return 1;
-} // destructeur
+} // effaceEcran

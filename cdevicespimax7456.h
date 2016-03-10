@@ -55,8 +55,6 @@ class CDeviceSpiMax7456 : public QObject
     Q_OBJECT
 
 private:
-    QSharedMemory *mShm;
-    T_Mes *mData;   // pointeur du segment de mémoire partagé
     CSpi *mSpi;
     int init();
 

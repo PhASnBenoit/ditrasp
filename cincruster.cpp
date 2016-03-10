@@ -40,7 +40,6 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     for(int i=0 ; i<mNbCapteur ; i++) {
         *pNoMes++ = mData[i].noMes;
     } // for
-
     // envoi du message pour mise à jour de l'affichage
     mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal capté par ce même objet
     qDebug("CIncruster envoi d'un message!");
@@ -59,7 +58,7 @@ CIncruster::~CIncruster()
    delete mMax;
    mShm->detach();
    delete mShm;
-}
+} // destructeur
 
 void CIncruster::razAff()
 {
