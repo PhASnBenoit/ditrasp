@@ -12,11 +12,11 @@
 // structure du fichier de configuration config.ini
 typedef struct {
     int noMes;              // numéro de la mesure
-    char nomClasse[50];     // nom de la classe de gestion du capteur
-    char nomMes[50];        // nom de la mesure
-    char symbUnit[11];      // Symbole de l'unité de la mesure
-    char textUnit[50];      // Texte de l'unité
-    char valMes[15];        // Valeur instantannée de la mesure
+    char nomClasse[AFFMAX];     // nom de la classe de gestion du capteur
+    char nomMes[AFFMAX];        // nom de la mesure
+    char symbUnit[AFFMAX];      // Symbole de l'unité de la mesure
+    char textUnit[AFFMAX];      // Texte de l'unité
+    char valMes[AFFMAX];        // Valeur instantannée de la mesure
 } T_Mes;
 
 #endif // GLOBAL_H

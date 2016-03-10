@@ -86,8 +86,7 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
         case ';': com[1]=0x43; break;
         case ':': com[1]=0x44; break;
         case ',': com[1]=0x45; break;
-        case '\'':
-        case '°':com[1]=0x46; break;
+        case '\'':com[1]=0x46; break;
         case '/': com[1]=0x47; break;
         case '\"': com[1]=0x48; break;
         case '-': com[1]=0x49; break;

@@ -19,7 +19,7 @@
 typedef union umess {
     double valDouble;
     int valInt;
-    char valCh[15];
+    char valCh[AFFMAX];
 } U_Mess;
 typedef struct {
     long type;

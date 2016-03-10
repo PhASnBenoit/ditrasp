@@ -24,7 +24,9 @@ SOURCES += main.cpp\
     ccapteuri2chmc5883_comp.cpp \
     ccontrolercamera.cpp \
     ccommuniquer.cpp \
-    cincruster.cpp
+    cincruster.cpp \
+    ccapteurserialgps.cpp \
+    cserialport.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -37,6 +39,11 @@ HEADERS  += mainwindow.h \
     ccapteuri2chmc5883_comp.h \
     ccontrolercamera.h \
     ccommuniquer.h \
-    cincruster.h
+    cincruster.h \
+    ccapteurserialgps.h \
+    cserialport.h
 
 FORMS    += mainwindow.ui
+
+OTHER_FILES += \
+    config.ini

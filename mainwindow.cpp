@@ -52,18 +52,25 @@ MainWindow::MainWindow(QWidget *parent) :
         memcpy(data, &mesures.at(i), sizeof(T_Mes));
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cLm76_Temp", sizeof("CCapteurI2cLm76_Temp"))) {
             qDebug("Capteur LM76 Temp reconnu !");
-            capteurs.append(new CCapteurI2cLm76_Temp(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
+            capteurs.append(new CCapteurI2cLm76_Temp(this, mesures.at(i).noMes, 0x48));  // le thread est créé mais n'est pas lancé
             capteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
             nbMesure++;
         } // if LM76
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHmc5883_Comp", sizeof("CCapteurI2cHmc5883_Comp"))) {
             qDebug("Capteur Compas HMC5883 reconnu !");
-            capteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes));  // le thread est créé mais n'est pas lancé
+            capteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes, 0x1E));  // le thread est créé mais n'est pas lancé
             capteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
             nbMesure++;
-        } // if 5883        // USAGE ULTERIEUR
+        } // if 5883
+        if (!strncmp(mesures.at(i).nomClasse, "CCapteurSerialGps", sizeof("CCapteurSerialGps"))) {
+            qDebug("Capteur GPS reconnu !");
+            capteurs.append(new CCapteurSerialGps(this, "/dev/ttyAMA0", mesures.at(i).noMes, 9600, 'N', 8));  // le thread est créé mais n'est pas lancé
+            capteurs.at(i)->start();                   // lancement du thread
+            inconnu = false;                           // la mesure est connue
+            nbMesure++;
+        } // if GPS
         // TO DO Here : autre définition des capteurs
 
         if (inconnu==true)
