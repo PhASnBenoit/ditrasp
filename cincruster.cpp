@@ -27,6 +27,7 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     if (!mShm->attach())
         qDebug(mShm->errorString().toStdString().c_str());
     mNbCapteur=mShm->size()/sizeof(T_Mes);  // nombre de mesures disponibles sur le drone
+    qDebug() << "CIncruster: " << mNbCapteur << "capteurs vus." << mShm->size() << "/" << sizeof(T_Mes);
     mData = (T_Mes *)mShm->constData(); // obtient le pointeur sur la mémoire
 
     // lien vers la file de messages
@@ -38,7 +39,9 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     // de toutes les mesures des capteurs présents !!!
     int *pNoMes = &mMessInc.hg;  // pointe sur la première position dans la structure du message
     for(int i=0 ; i<mNbCapteur ; i++) {
-        *pNoMes++ = mData[i].noMes;
+        *pNoMes = mData[i].noMes;
+        qDebug() << "CIncruster i " << i << "MessInc " << *pNoMes;
+        pNoMes++;
     } // for
     // envoi du message pour mise à jour de l'affichage
     mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal capté par ce même objet
@@ -81,7 +84,7 @@ void CIncruster::majAff()
             strcpy(pA->texte, mData[*pI].valMes);  // accès à la mémoire partagée
             strcat(pA->texte, mData[*pI].symbUnit);
             mShm->unlock();
-            qDebug() << "CIncruster Mesure : " << pA->texte;
+ //           qDebug() << "CIncruster Mesure : " << pA->texte;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage

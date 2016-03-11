@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
          } // if
     } // while
 
+    qDebug() << "Main:" << nbLigne << "capteurs vus";
     // création du segment de mémoire partagé contenant la description des capteurs et les valeurs instantanées
     shm = new QSharedMemory(KEY, this);
     shm->attach();   // tentative de s'attacher
@@ -43,9 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
         if (res == false)
             qDebug(shm->errorString().toStdString().c_str());
     } // if isattached
-
     // sauvegarde en mémoire partagée et instanciation des objets threads de lecture des mesures
     T_Mes *data = (T_Mes *)shm->data();
+
     nbMesure=0;
     for(int i=0 ; i<nbLigne ; i++) {
         bool inconnu=true;                          // le capteur par défaut n'est pas reconnu
@@ -102,8 +103,10 @@ MainWindow::~MainWindow()
     delete pc_com;
     delete pc_contcam;
     delete pc_inc;
-    for(int i=0 ; i<capteurs.size() ; i++)
+    for(int i=0 ; i<capteurs.size() ; i++) {
+//        capteurs.at(i)->stop();
         delete capteurs.at(i);
+    } // for
     shm->detach();
     delete shm;
     msg->detruire();

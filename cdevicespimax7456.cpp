@@ -55,7 +55,7 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
     usleep(1000);
 
     int dispMemAddr = r*cMax+c;
-    qDebug() << "CDeviceSpiMax7456 : " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
+  //  qDebug() << "CDeviceSpiMax7456 : " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
 
     while(*mes!=0) {  // on effectue la boucle jusqu'à la fin de la chaine (caractère NULL)
         (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
@@ -90,10 +90,10 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
         }; // sw
         mSpi->ecrire(com,2);
         usleep(1000);
-        qDebug() << "caractère : " << *mes;
+//        qDebug() << "caractère : " << *mes;
         mes++; // car suivant
         dispMemAddr++;
-        qDebug() << "Après inc : " << dispMemAddr;
+//        qDebug() << "Après inc : " << dispMemAddr;
     } // while
 
     return -1;

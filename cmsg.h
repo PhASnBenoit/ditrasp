@@ -68,12 +68,12 @@ public:
     int detruire();
 
 private:
-    int membId;             // pour le calcul de la clef
-    char membNomFic[255];   // nom du fichier présent pour le calcul de la clef
-    bool membInited;        // état initialise ou non
-    key_t membClef;         // clef d'accès à la file de message
-    int membMsQId;          // identifiant de la file de message
-    T_MessMes membMess;     // réceptacle d'un message en cours de traitement
+    int mId;             // pour le calcul de la clef
+    char mNomFic[255];   // nom du fichier présent pour le calcul de la clef
+    bool mInited;        // état initialise ou non
+    key_t mClef;         // clef d'accès à la file de message
+    int mMsgId;          // identifiant de la file de message
+    T_MessMes mMess;     // réceptacle d'un message en cours de traitement
 
 signals:
     void mailReady(long type);   // un message est arrivé dans la file

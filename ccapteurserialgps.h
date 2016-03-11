@@ -17,6 +17,7 @@ public:
     explicit CCapteurSerialGps(QObject *parent = 0, const char *nomvs = "/dev/ttyAMA0", int no = 0, int vit = 9600, char par = 'N', int nbc = 8);
     ~CCapteurSerialGps();
     void run();  // méthode virtuelle à implémenter, contenu du thread
+    void stop();
 
 private:
     int mNum; // numéro de la mesure
@@ -24,6 +25,7 @@ private:
     T_Mes *mData;   // pointeur du segment de mémoire partagé
     int lireMesure(QByteArray &latitude, QByteArray &longitude);  // retourne lat et long
     CSerialPort *mPs;  // gestion du port série
+    bool arret;
 
 signals:
 

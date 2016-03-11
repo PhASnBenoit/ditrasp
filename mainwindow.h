@@ -28,14 +28,16 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    CMsg *msg;  // file des messages
-    QSharedMemory *shm;  // segment de mémoire partagé
 
 private:
     Ui::MainWindow *ui;
+    CMsg *msg;  // file des messages
+    QSharedMemory *shm;  // segment de mémoire partagé
+
     CCommuniquer *pc_com;
     CIncruster *pc_inc;
     CControlerCamera *pc_contcam;
+
     QList<QThread *> capteurs;   // tableau de thread des capteurs
     QTimer *timer;
     int nbMesure;

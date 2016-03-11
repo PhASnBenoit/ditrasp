@@ -3,7 +3,7 @@
 CMsg::CMsg(QObject *parent) :
     QObject(parent)
 {
-    membInited=false;
+    mInited=false;
 } // constructeur
 
 CMsg::~CMsg()
@@ -12,22 +12,22 @@ CMsg::~CMsg()
 
 int CMsg::initialiser(const char *nomFic, int id)
 {
-    strncpy(membNomFic, nomFic, 254);
-    membId = id;
-    membClef = ftok(membNomFic, membId);  // calcul de la clef d'accès
-    membMsQId = msgget(membClef, IPC_CREAT|0660);
-    if (membMsQId==-1) return membMsQId;
-    membInited = true;
-    return membMsQId;
+    strncpy(mNomFic, nomFic, 254);
+    mId = id;
+    mClef = ftok(mNomFic, mId);  // calcul de la clef d'accès
+    mMsgId = msgget(mClef, IPC_CREAT|0660);
+    if (mMsgId==-1) return mMsgId;
+    mInited = true;
+    return mMsgId;
 } // initialiser
 
 int CMsg::sendMessage(long type, const void *mess, size_t taille)
 {
     T_MessInc *pMess = (T_MessInc *) mess;
-    if (!membInited) return -1;  // si non initialisation de la file
+    if (!mInited) return -1;  // si non initialisation de la file
     pMess->type = type;
-    //membMess = mess;
-    int res = msgsnd(membMsQId, mess, taille, IPC_NOWAIT);  // retourne 0 si RAS
+    //mMess = mess;
+    int res = msgsnd(mMsgId, mess, taille, IPC_NOWAIT);  // retourne 0 si RAS
     if (!res) // si RAS
         emit mailReady(type);
     return res;
@@ -35,12 +35,12 @@ int CMsg::sendMessage(long type, const void *mess, size_t taille)
 
 int CMsg::getMessage(long type, void *mess, size_t taille)
 {
-    if (!membInited) return -1;  // si non initialisation de la file
-    return msgrcv(membMsQId, mess, taille, type, IPC_NOWAIT);
+    if (!mInited) return -1;  // si non initialisation de la file
+    return msgrcv(mMsgId, mess, taille, type, IPC_NOWAIT);
 } // getMessage
 
 int CMsg::detruire()
 {
-    membInited=false;
-    return msgctl(membMsQId, IPC_RMID, 0); // effacement immédiat de la file
+    mInited=false;
+    return msgctl(mMsgId, IPC_RMID, 0); // effacement immédiat de la file
 } // getMessage
