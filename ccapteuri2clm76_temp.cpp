@@ -8,7 +8,6 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
 
     mNum = no;  // numéro de la mesure du fichier config.ini
     mAddr = addr;
-    arret=false;
 
     unsigned char buf=0;
     i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
@@ -36,6 +35,8 @@ CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 void CCapteurI2cLm76_Temp::run()
 {
     float mesure;
+    arret=false;
+
     while(!arret) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesure = lireMesure();
@@ -45,7 +46,7 @@ void CCapteurI2cLm76_Temp::run()
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
 //        qDebug(chMes);
-        sleep(1);
+        usleep(500000); // lecture toutes les 0.5s
     } // while
 }
 

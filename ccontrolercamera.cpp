@@ -27,7 +27,7 @@ void CControlerCamera::onMessReady(long type)
     int res;
     T_MessOrdre mess;
     switch (type) {
-    case TYPE_MESS_ORDRE_CAMERA :
+    case TYPE_MESS_ORDRE_CAMERA:
         res =  pMsg->getMessage(TYPE_MESS_ORDRE_CAMERA, &mess, sizeof(T_MessOrdre));
         if (res < 0)
            qDebug("Erreur extraction du message !");

@@ -99,13 +99,13 @@ void CIncruster::onMessReady(long type)
     qDebug("PC_Incruste : Un message est arrivé");
     switch (type) {
     case TYPE_MESS_INCRUSTER:  // modification des paramètres à afficher
-        qDebug("pc_incruster: nouveaux params d'incrustation");
+        qDebug("CIncruster: nouveaux params d'incrustation");
         res =  mMsg->getMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // lecture du message arrivé
         if (res < 0)
            qDebug("Erreur extraction du message !");
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
-        qDebug("pc_incruster: nouveaux params timer");
+        qDebug("CIncruster: nouveaux params timer");
         T_MessIntTimer mess;
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
         mTimer->stop();

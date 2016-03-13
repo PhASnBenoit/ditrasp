@@ -28,7 +28,7 @@ void CCapteurSerialGps::run()
     QString mesure;
 
     arret=false;
-    while(1) {
+    while(!arret) {
         qDebug() << "GPS thread running !";
         lireMesure(latitude, longitude);
         mesure = "Lat:"+QString(latitude)+" Long:"+QString(longitude);

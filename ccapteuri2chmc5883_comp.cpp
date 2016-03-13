@@ -6,7 +6,6 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
 {
     int res;
 
-    arret=false;
     mNum = no;  // numéro de la mesure du fichier config.ini
     mAddrW = addr;  // Adresse du module I2C en écriture
     mAddrR = mAddrW;  // adresse pour la lecture
@@ -44,15 +43,17 @@ CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 void CCapteurI2cHmc5883_Comp::run()
 {
     int axes[3];
+
+    arret=false;
     while(!arret) {
         // écriture de la mesure dans le segment de mémoire partagé
-        lireMesure(axes);
+        lireMesure(axes); // conversions incluses
         char chMes[15];
-        sprintf(chMes,"%03x %03x %03x",axes[0], axes[1], axes[2]);
-        mShm->lock(); // on prend la mémoire partagée
+        sprintf(chMes,"%03d %03d %03d",axes[0], axes[1], axes[2]);
+        mShm->lock(); // on réserve la mémoire partagée
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
-        sleep(1);
+        usleep(500000); // lecture toutes les 0.5s
     } // while
 }
 
@@ -65,8 +66,10 @@ void CCapteurI2cHmc5883_Comp::stop()
 int CCapteurI2cHmc5883_Comp::lireMesure(int axes[3])
 {
     int res;
-    res = i2c->lire(mAddrR, (unsigned char *)&axes[0], 2);
-    res = i2c->lire(mAddrR, (unsigned char *)&axes[1], 2);
-    res = i2c->lire(mAddrR, (unsigned char *)&axes[2], 2);
+    for (int i=0 ; i<3 ; i++) {
+        res = i2c->lire(mAddrR, (unsigned char *)&axes[i], 2);
+        if (axes[i]>0) axes[i] = (axes[i]*180)/2047; // conversion en degré -180 --> 0
+        else axes[i] = (axes[i]*180)/2048;           // conversion en degré 0 --> +180
+    } // for
     return res;
 } // lireCapteur

@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include <QDebug>
-//#include <QSerialPortInfo>
-//#include <QSerialPort>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include <stdio.h>
+#include <global.h>
 #include "cmsg.h"
 
 class CCommuniquer : public QObject
@@ -14,16 +15,20 @@ class CCommuniquer : public QObject
 
 public:
     explicit CCommuniquer(QObject *parent = 0, CMsg *msg = 0);
+    ~CCommuniquer();
 
 private:
+    QObject *pParent;
     CMsg *pMsg;
-//    QSerialPortInfo *psi;
-//    QSerialPort *ps;
+    QSerialPort *mPs;
+    int initPs();
+    int protocole();
 
 signals:
 
 private slots:
-    void onMessReady(long type);
+    void onMessReady(long type);    // message dans la file
+    void onReadyRead();             // si réception par voie série
 
 public slots:
 

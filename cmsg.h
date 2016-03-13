@@ -12,7 +12,7 @@
 #define TYPE_MESS_MESURE 1  // type du message pour transmettre une mesure
 #define TYPE_MESS_INCRUSTER 2 //      ""    "       changer l'incrustation
 #define TYPE_MESS_TIMERINC 21     //    ""              changer l'interval du timer d'incrustation
-#define TYPE_MESS_ORDRE_CAMERA 3  // pour les ordre ccontrolercamera
+#define TYPE_MESS_ORDRE_CAMERA 5  // pour prendre une photo, start/stop REC vidéo
 #define TYPE_MESS_ACK_ORDRE 11  // pour communiquer ACK des ordres
 
 // type de message pour une mesure
@@ -41,12 +41,11 @@ typedef struct {
     int bd;
 } T_MessInc;
 
-// type pour changer l'interval d'un timer
+// type pour un ordre
 typedef struct {
     long type;
     char ordre[255];
 } T_MessOrdre;
-
 
 // type pour changer l'interval d'un timer
 typedef struct {

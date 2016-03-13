@@ -1,7 +1,6 @@
 #ifndef CCAPTEURI2CLM76_TEMP_H
 #define CCAPTEURI2CLM76_TEMP_H
 
-#include <QObject>
 #include <QThread>
 #include <QDebug>
 #include <stdio.h>
