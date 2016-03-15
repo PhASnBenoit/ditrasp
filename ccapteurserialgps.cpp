@@ -17,6 +17,7 @@ CCapteurSerialGps::CCapteurSerialGps(QObject *parent, const char *nomvs, int no,
 
 CCapteurSerialGps::~CCapteurSerialGps()
 {
+    stop();
     delete mPs;
     mShm->detach();
     delete mShm;

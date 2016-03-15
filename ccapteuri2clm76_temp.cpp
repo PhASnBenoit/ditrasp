@@ -14,7 +14,7 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
     if (i2c == NULL)
         qDebug("CCapteurI2cLm76_Temp: Pb init I2C");
     res = i2c->ecrire(mAddr, &buf, 1);
-    if (res != 1) qDebug("pb ecriture");
+    if (res != 1) qDebug("CCapteurI2cLm76_Temp: pb ecriture");
 
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
     if (!mShm->attach())
@@ -27,6 +27,7 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 {
+    stop();
     i2c->freeInstance();
     mShm->detach();
     delete mShm;

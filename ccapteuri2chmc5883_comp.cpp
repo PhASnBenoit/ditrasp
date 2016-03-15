@@ -35,6 +35,7 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 {
+    stop();
     i2c->freeInstance();
     mShm->detach();
     delete mShm;

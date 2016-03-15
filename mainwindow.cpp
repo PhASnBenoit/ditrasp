@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     while (!file.atEnd()) {         // lecture des lignes du fichier
          QByteArray line = file.readLine();
          if (isdigit(line[0])) {    // si le premier car de la ligne est 0-9
+             qDebug() << "CONFIG.INI: " << line;
              parties = line.split(';'); // extrait chaque partie de la ligne
              mes.noMes = parties.at(0).toInt();
              strncpy(mes.nomClasse, parties.at(1).toStdString().c_str(), sizeof(mes.nomClasse));
@@ -104,7 +105,6 @@ MainWindow::~MainWindow()
     delete pc_contcam;
     delete pc_inc;
     for(int i=0 ; i<capteurs.size() ; i++) {
-//        capteurs.at(i)->stop();
         delete capteurs.at(i);
     } // for
     shm->detach();

@@ -10,7 +10,7 @@ CSerialPort::CSerialPort(QObject *parent, const char *nomvs, int vit, char par, 
     if (!mFile->open(QIODevice::ReadOnly | QIODevice::Text))
         qDebug() << "Erreur ouverture port série";
     // ajouter l'init des params voie série
-    // initPS(); // à définir
+    initPS(); // à définir
 } // constructeur
 
 CSerialPort::~CSerialPort()
@@ -22,5 +22,10 @@ CSerialPort::~CSerialPort()
 int CSerialPort::lireLigne(QByteArray &qba)
 {
     qba = mFile->readLine();
+    return 1;
+}
+
+int CSerialPort::initPS()
+{
     return 1;
 } // destructeur

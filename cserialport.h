@@ -22,7 +22,7 @@ private:
     int mNbc;  // nb de bit par caractère
     char mNomVs[200];  // nom du fichier voie série
     QFile *mFile;
-
+    int initPS();
 signals:
 
 public slots:

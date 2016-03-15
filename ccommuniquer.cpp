@@ -5,26 +5,50 @@ CCommuniquer::CCommuniquer(QObject *parent, CMsg *msg) :
 {
     this->pParent = parent;
     pMsg = msg;
+    // shm
+    mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
+    if (!mShm->attach())
+        qDebug() << mShm->errorString();
+    mData = (T_Mes *)mShm->data(); // obtient le pointeur sur la mémoire
+
     QList<QSerialPortInfo> listPsi;  // liste des ports série existant
     listPsi = QSerialPortInfo::availablePorts();  // récupère les ports série disponibles
     qDebug() << listPsi.at(0).description();
     mPs = new QSerialPort(this);
-    initPs();
+    initPs(mPs);
     connect(mPs, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+
+    // ouvrir le fichier de stockage des mesures
+    QString nom("mesures.csv");
+    mFileCsv = new QFile(nom);
+    if (!mFileCsv->open(QIODevice::Truncate))
+        qDebug() << "Erreur création fichier mesures.csv.";
+    mFileCsv->close();
+    mFileCsv->open(QIODevice::Append|QIODevice::Text);
+
+    // init du timer de sauvegarde des mesures
+    timer = new QTimer(this);
+    timer->setInterval(2000);  // 2s par défaut
+    connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+
     qDebug() << "CCommuniquer démarre !";
 } // constructeur
 
 CCommuniquer::~CCommuniquer()
 {
+    delete timer;
+    mFileCsv->close();
+    delete mFileCsv;
     mPs->close();
     delete mPs;
-}  // destructeur
+    mShm->detach();
+    delete mShm;
+}
 
-
-int CCommuniquer::initPs()
+int CCommuniquer::initPs(QSerialPort *mPs)
 {
     return 1;
-} // init
+}  // destructeur
 
 int CCommuniquer::protocole()
 {
@@ -38,8 +62,10 @@ int CCommuniquer::protocole()
         case '0': // START MISSION
             break;
         case '1': // START ACQUISITION MESURE
+            timer->start();
             break;
         case '2': // STOP ACQUISITION
+            timer->stop();
             break;
         case '3': // RECEPTION PARAMS CONFIG MISSION
             break;
@@ -47,7 +73,7 @@ int CCommuniquer::protocole()
             break;
         case '5': // ORDRE CAMERA
             T_MessOrdre ordre;
-            qbaCorps = mPs->read(35);  // requete GET de 35 caractères
+            qbaCorps = mPs->read(35);  // requete GET de 35 caractères (mdp par défaut)
             strncpy(ordre.ordre, qbaCorps.toStdString().c_str(),35);
             pMsg->sendMessage(TYPE_MESS_ORDRE_CAMERA,&ordre, sizeof(T_MessOrdre));
             break;
@@ -81,6 +107,24 @@ void CCommuniquer::onReadyRead()
         } // if [
     } // while
 } // onReadyRead
+
+void CCommuniquer::onTimer()
+{
+    // sauver les mesures dans le fichier sur une ligne horodatée
+    QString ligne;
+    ligne = QDateTime::currentDateTime().toString();
+    ligne += ";";
+    mShm->lock();
+    for(int i=0 ; i<(mShm->size()/sizeof(T_Mes)) ; i++) {
+        ligne += mData[i].valMes;
+        ligne += ";";
+    } // for
+    mShm->unlock();
+    mFileCsv->write(ligne.toStdString().c_str(), ligne.size());
+    // emettre la mesure vers la GCS
+    // étant dans le même objet, il ne peut y avoir de conflit sur la voie série
+
+} // onTimer
 
 void CCommuniquer::onMessReady(long type)
 {
