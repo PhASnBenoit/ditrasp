@@ -4,8 +4,11 @@
 #include <QThread>
 #include <QDebug>
 #include <stdio.h>
+#include <math.h>
 #include "global.h"
 #include "ci2c.h"
+
+#define PI 3.14159265
 
 class CCapteurI2cHmc5883_Comp : public QThread
 {
@@ -15,7 +18,7 @@ private :
     int mNum;
     QSharedMemory *mShm;
     T_Mes *mData;   // pointeur du segment de mémoire partagé
-    int lireMesure(int axes[3]);
+    int lireMesure(float &angle);
     CI2c *i2c;
     unsigned char mAddrW, mAddrR; // adr d'écriture et lecture
     bool arret;

@@ -62,9 +62,9 @@ float CCapteurI2cLm76_Temp::lireMesure()
     float temp;
     unsigned char mes[2];
 //    char aff[50];
-    int res;
+//    int res;
 
-    res = i2c->lire(mAddr, mes, 2);
+    i2c->lire(mAddr, mes, 2);
 
     unsigned char msb = mes[0];
     unsigned char lsb = mes[1];

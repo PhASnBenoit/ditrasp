@@ -47,6 +47,9 @@ CCommuniquer::~CCommuniquer()
 
 int CCommuniquer::initPs(QSerialPort *mPs)
 {
+    mPs->setBaudRate(mPs->Baud9600);
+    mPs->setDataBits(mPs->Data8);
+    mPs->setParity(mPs->NoParity);
     return 1;
 }  // destructeur
 
@@ -115,7 +118,7 @@ void CCommuniquer::onTimer()
     ligne = QDateTime::currentDateTime().toString();
     ligne += ";";
     mShm->lock();
-    for(int i=0 ; i<(mShm->size()/sizeof(T_Mes)) ; i++) {
+    for(int i=0 ; i<(int)(mShm->size()/sizeof(T_Mes)) ; i++) {
         ligne += mData[i].valMes;
         ligne += ";";
     } // for

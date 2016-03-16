@@ -43,18 +43,19 @@ CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 
 void CCapteurI2cHmc5883_Comp::run()
 {
-    int axes[3];
+    float angle;
 
     arret=false;
     while(!arret) {
         // écriture de la mesure dans le segment de mémoire partagé
-        lireMesure(axes); // conversions incluses
+        lireMesure(angle); // conversions incluses
         char chMes[15];
-        sprintf(chMes,"%03d %03d %03d",axes[0], axes[1], axes[2]);
+        sprintf(chMes,"%3.1f",angle);
+        qDebug() << "CCapteurI2cHmc5883_Comp angle : " << angle;
         mShm->lock(); // on réserve la mémoire partagée
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
-        usleep(500000); // lecture toutes les 0.5s
+        usleep(250000); // lecture toutes les 250ms
     } // while
 }
 
@@ -64,13 +65,24 @@ void CCapteurI2cHmc5883_Comp::stop()
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CCapteurI2cHmc5883_Comp::lireMesure(int axes[3])
+int CCapteurI2cHmc5883_Comp::lireMesure(float &angle)
 {
-    int res;
+    int res=0;
+    double declin;
+    unsigned short axes[3];
+    double daxes[3];
+
     for (int i=0 ; i<3 ; i++) {
-        res = i2c->lire(mAddrR, (unsigned char *)&axes[i], 2);
-        if (axes[i]>0) axes[i] = (axes[i]*180)/2047; // conversion en degré -180 --> 0
-        else axes[i] = (axes[i]*180)/2048;           // conversion en degré 0 --> +180
+        res += i2c->lire(mAddrR, (unsigned char *)&axes[i], 2);  // valeur en micro tesla
+        daxes[i] = axes[i];
     } // for
+    // calcul de l'angle de déclinaison
+    declin = atan2(daxes[1], daxes[0]); // résultat en radian
+    if(declin < 0)
+        declin += 2*PI;
+    // Check for wrap due to addition of declination.
+    if(declin > 2*PI)
+        declin -= 2*PI;
+    angle = (float)(declin*180/PI);
     return res;
 } // lireCapteur
