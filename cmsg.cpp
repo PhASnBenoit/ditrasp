@@ -15,7 +15,7 @@ int CMsg::initialiser(const char *nomFic, int id)
     strncpy(mNomFic, nomFic, 254);
     mId = id;
     mClef = ftok(mNomFic, mId);  // calcul de la clef d'accès
-    mMsgId = msgget(mClef, IPC_CREAT|0660);
+    mMsgId = msgget(mClef, IPC_CREAT|0666);
     if (mMsgId==-1) return mMsgId;
     mInited = true;
     return mMsgId;

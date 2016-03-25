@@ -15,12 +15,13 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
         qDebug("CCapteurI2cHmc5883_Comp: Pb init I2C");
 
     // init du composant I2C
-    unsigned char buf[4]={0x00, // n° du registre config regA
-                          0x10, // valeur Config Reg A
-                          0x20, // Config Reg B
+    unsigned char buf[]={//0x00, // n° du registre config regA
+                          0x71, // valeur Config Reg A
+                          0xA0, // Config Reg B
                           0x00  // mode register
                          };
-    res = i2c->ecrire(mAddrW, buf, 4);
+    res = i2c->ecrire(mAddrW, buf, 3);
+    usleep(200000);
     qDebug() << "HMC5883: nb car ecrits : " << res;
     if (res == -1) qDebug("CCapteurI2cHmc5883_Comp: pb ecriture");
 
@@ -43,19 +44,20 @@ CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 
 void CCapteurI2cHmc5883_Comp::run()
 {
-    float angle;
+    short inclinx, incliny, inclinz;
+    float declinz;
 
     arret=false;
     while(!arret) {
         // écriture de la mesure dans le segment de mémoire partagé
-        lireMesure(angle); // conversions incluses
-        char chMes[15];
-        sprintf(chMes,"%3.1f",angle);
-        qDebug() << "CCapteurI2cHmc5883_Comp angle : " << angle;
+        lireMesure(declinz, inclinx, incliny, inclinz); // conversions incluses
+        char chMes[50];
+        sprintf(chMes,"Angle:%3.1f X:%d, Y:%d, Z=%d",declinz, inclinx, incliny, inclinz);
+        qDebug() << "CCapteurI2cHmc5883_Comp, run angle : " << chMes;
         mShm->lock(); // on réserve la mémoire partagée
         strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
-        usleep(250000); // lecture toutes les 250ms
+        usleep(250000);
     } // while
 }
 
@@ -65,24 +67,68 @@ void CCapteurI2cHmc5883_Comp::stop()
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CCapteurI2cHmc5883_Comp::lireMesure(float &angle)
+int CCapteurI2cHmc5883_Comp::lireMesure(float &declinz, short &inclinx,short &incliny, short &inclinz)
 {
     int res=0;
-    double declin;
-    unsigned short axes[3];
-    double daxes[3];
+    double resarc;
+    unsigned char axe[6];
+    //double daxes[3];
+//    short x,y,z;
 
-    for (int i=0 ; i<3 ; i++) {
-        res += i2c->lire(mAddrR, (unsigned char *)&axes[i], 2);  // valeur en micro tesla
-        daxes[i] = axes[i];
-    } // for
+    unsigned char buf=0x03; // n° du registre premier axe
+    res = i2c->ecrire(mAddrW, &buf, 1); // positionnement registre axe x msb
+    usleep(70000);
+    res = i2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
+    inclinx = (axe[0]<<8) + axe[1];
+    incliny = (axe[2]<<8) + axe[3];
+    inclinz = (axe[4]<<8) + axe[5];
+
     // calcul de l'angle de déclinaison
-    declin = atan2(daxes[1], daxes[0]); // résultat en radian
-    if(declin < 0)
-        declin += 2*PI;
-    // Check for wrap due to addition of declination.
-    if(declin > 2*PI)
-        declin -= 2*PI;
-    angle = (float)(declin*180/PI);
+    resarc = atan2(inclinx,inclinz); // résultat en radian
+    if(resarc < 0)
+        resarc += 2*PI;
+    if(resarc > 2*PI)
+        resarc -= 2*PI;
+    declinz = (float)(resarc*180/PI);
+    //declinz = (axe[4]<<8) + axe[5];
     return res;
+    /*
+    //for (int i=0 ; i<3 ; i++) {
+        res += i2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
+        //daxes[i] = (double)axes[i];
+        //qDebug() << "CCapteurI2cHmc5883_Comp, lireMesure : daxe[" << i << "] : " << daxes[i];
+        usleep(1000);
+    //} // for
+
+    x=(axe[0]<<8) + axe[1];
+    y=(axe[2]<<8) + axe[3];
+    z=(axe[4]<<8) + axe[5];
+
+    qDebug() << "CCapteurI2cHmc5883_Comp, lireMesure : x = " << x << " y = " << y << " z = " << z;
+
+    // calcul de l'angle de déclinaison
+    resarc = atan2((double)x,(double) y); // résultat en radian
+    if(resarc < 0)
+        resarc += 2*PI;
+    if(resarc > 2*PI)
+        resarc -= 2*PI;
+    declinz = (float)(resarc*180/PI);
+
+    // calcul de l'angle de inclinx
+    resarc = atan2((double)y,(double) z); // résultat en radian
+    if(resarc < 0)
+        resarc += 2*PI;
+    if(resarc > 2*PI)
+        resarc -= 2*PI;
+    inclinx = (float)(resarc*180/PI);
+
+    // calcul de l'angle de incliny
+    resarc = atan2((double)x,(double) z); // résultat en radian
+    if(resarc < 0)
+        resarc += 2*PI;
+    if(resarc > 2*PI)
+        resarc -= 2*PI;
+    incliny = (float)(resarc*180/PI);
+
+    return 1;*/
 } // lireCapteur

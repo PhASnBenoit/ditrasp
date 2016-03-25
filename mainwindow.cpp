@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
      // lancement du timer de mise à jour des mesures dans l'IHM
     timer = new QTimer(this);
-    timer->setInterval(1000);
+    timer->setInterval(250);
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     timer->start();
 

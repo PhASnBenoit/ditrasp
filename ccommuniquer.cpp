@@ -13,16 +13,18 @@ CCommuniquer::CCommuniquer(QObject *parent, CMsg *msg) :
 
     QList<QSerialPortInfo> listPsi;  // liste des ports série existant
     listPsi = QSerialPortInfo::availablePorts();  // récupère les ports série disponibles
-    qDebug() << listPsi.at(0).description();
-    mPs = new QSerialPort(this);
+    for(int i=0 ; i<listPsi.size() ; i++)
+        qDebug() << "CCommuniquer : " << listPsi.at(i).portName() << " " << listPsi.at(i).description();
+/*
+    mPs = new QSerialPort(listPsi.at(0).portName(),this);
     initPs(mPs);
     connect(mPs, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
 
     // ouvrir le fichier de stockage des mesures
-    QString nom("mesures.csv");
+    QString nom("~/mesures.csv");
     mFileCsv = new QFile(nom);
     if (!mFileCsv->open(QIODevice::Truncate))
-        qDebug() << "Erreur création fichier mesures.csv.";
+        qDebug() << "CCommuniquer : " << "Erreur création fichier mesures.csv.";
     mFileCsv->close();
     mFileCsv->open(QIODevice::Append|QIODevice::Text);
 
@@ -30,7 +32,7 @@ CCommuniquer::CCommuniquer(QObject *parent, CMsg *msg) :
     timer = new QTimer(this);
     timer->setInterval(2000);  // 2s par défaut
     connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-
+*/
     qDebug() << "CCommuniquer démarre !";
 } // constructeur
 
@@ -50,6 +52,7 @@ int CCommuniquer::initPs(QSerialPort *mPs)
     mPs->setBaudRate(mPs->Baud9600);
     mPs->setDataBits(mPs->Data8);
     mPs->setParity(mPs->NoParity);
+    mPs->open(QIODevice::ReadWrite);
     return 1;
 }  // destructeur
 
@@ -133,7 +136,7 @@ void CCommuniquer::onMessReady(long type)
 {
     int res;
     T_MessMes mess;
-    if (type == 1) {
+    if (type == TYPE_MESS_ACK_ORDRE) {
         qDebug() << "CCommuniquer: Message reçu !";
         res =  pMsg->getMessage(TYPE_MESS_ACK_ORDRE, &mess, sizeof(T_MessMes));
         if (res < 0)
