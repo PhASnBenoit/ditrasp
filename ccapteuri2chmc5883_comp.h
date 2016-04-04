@@ -27,12 +27,11 @@ public:
     explicit CCapteurI2cHmc5883_Comp(QObject *parent = 0, int no = 0, unsigned char addr = 0x1E); // no de la mesure définit dans le fichier de config "config.ini"
     ~CCapteurI2cHmc5883_Comp();
     void run();  // méthode virtuelle à implémenter, contenu du thread
-    void stop();
 
 signals:
 
 public slots:
-
+    void stop();
 };
 
 #endif // CCAPTEURI2CHMC5883_COMP_H

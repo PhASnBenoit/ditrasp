@@ -24,12 +24,12 @@ public:
     explicit CCapteurSerialGps(QObject *parent = 0, const char *nomvs = "/dev/ttyAMA0", int no = 0, int vit = 9600, char par = 'N', int nbc = 8);
     ~CCapteurSerialGps();
     void run();  // méthode virtuelle à implémenter, contenu du thread
-    void stop();
+
 
 signals:
 
 public slots:
-
+    void stop();
 };
 
 #endif // CCAPTEURSERIALGPS_H

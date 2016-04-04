@@ -12,6 +12,7 @@
 // structure du fichier de configuration config.ini
 typedef struct {
     int noMes;              // numéro de la mesure
+    char adrCapteur[AFFMAX];    // Adresse ou fichier d'accès au capteur
     char nomClasse[AFFMAX];     // nom de la classe de gestion du capteur
     char nomMes[AFFMAX];        // nom de la mesure
     char symbUnit[AFFMAX];      // Symbole de l'unité de la mesure

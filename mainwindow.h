@@ -47,6 +47,9 @@ private slots:
     void on_pbLireMessage_clicked();
     void onTimer();
     //void on_pbQuitter_clicked();
+
+signals:
+    void arretThreadsCapteur();
 };
 
 #endif // MAINWINDOW_H

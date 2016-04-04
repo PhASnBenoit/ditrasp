@@ -28,7 +28,6 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 {
-    stop();
     i2c->freeInstance();
     mShm->detach();
     delete mShm;

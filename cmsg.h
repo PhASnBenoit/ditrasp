@@ -14,6 +14,7 @@
 #define TYPE_MESS_TIMERINC 21     //    ""              changer l'interval du timer d'incrustation
 #define TYPE_MESS_ORDRE_CAMERA 5  // pour prendre une photo, start/stop REC vidéo
 #define TYPE_MESS_ACK_ORDRE 11  // pour communiquer ACK des ordres
+#define TYPE_MESS_STOP_THREAD  // pour arrêt des threads capteurs
 
 // type de message pour une mesure
 typedef union umess {
