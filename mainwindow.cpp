@@ -71,6 +71,14 @@ MainWindow::MainWindow(QWidget *parent) :
             inconnu = false;                           // la mesure est connue
             nbMesure++;
         } // if 5883
+        if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHtu21d_HumTemp", sizeof("CCapteurI2cHtu21d_HumTemp"))) {
+            qDebug("Capteur Humidité et température HTU21D reconnu !");
+            capteurs.append(new CCapteurI2cHtu21d_HumTemp(this, mesures.at(i).noMes, 0x40));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cHtu21d_HumTemp *)capteurs.at(i), SLOT(stop()));
+            capteurs.at(i)->start();                   // lancement du thread
+            inconnu = false;                           // la mesure est connue
+            nbMesure++;
+        } // if 5883
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurSerialGps", sizeof("CCapteurSerialGps"))) {
             qDebug("Capteur GPS reconnu !");
             capteurs.append(new CCapteurSerialGps(this, "/dev/ttyAMA0", mesures.at(i).noMes, 9600, 'N', 8));  // le thread est créé mais n'est pas lancé

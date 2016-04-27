@@ -11,6 +11,7 @@
 #include "cmsg.h"
 #include "ci2c.h"
 #include "ccapteuri2clm76_temp.h"
+#include "ccapteuri2chtu21d_humtemp.h"
 #include "ccapteuri2chmc5883_comp.h"
 #include "ccapteurserialgps.h"
 #include "ccommuniquer.h"

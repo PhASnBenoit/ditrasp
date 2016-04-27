@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     ccommuniquer.cpp \
     cincruster.cpp \
     ccapteurserialgps.cpp \
-    cserialport.cpp
+    cserialport.cpp \
+    ccapteuri2chtu21d_humtemp.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     ccommuniquer.h \
     cincruster.h \
     ccapteurserialgps.h \
-    cserialport.h
+    cserialport.h \
+    ccapteuri2chtu21d_humtemp.h
 
 FORMS    += mainwindow.ui
 

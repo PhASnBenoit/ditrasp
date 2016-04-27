@@ -66,7 +66,7 @@ float CCapteurI2cLm76_Temp::lireMesure()
 
     res = i2c->lire(mAddr, mes, 2);
     if (res != 2)
-        qDebug() << "CCapteurI2cLm76_Temp: lireMesure res=" << res;
+        qDebug() << "CCapteurI2cLm76_Temp:lireMesure res=" << res;
     unsigned char msb = mes[0];
     unsigned char lsb = mes[1];
     sprintf(aff,"CCapteurI2cLm76_Temp res=%d msb=%02X lsb=%02X",res, msb, lsb);
