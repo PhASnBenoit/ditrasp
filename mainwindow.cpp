@@ -95,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
        pc_inc = new CIncruster(this, msg, 1000); // 1000ms d'actualisation de l'incrustation
        connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
     } // if nbMesure
+
     // création des objets et connexions à la file des messages
     connect(msg, SIGNAL(mailReady(long)), this, SLOT(onMessReady(long)));
     pc_contcam = new CControlerCamera(this, msg);

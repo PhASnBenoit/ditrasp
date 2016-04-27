@@ -13,10 +13,10 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
     i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel et adr du composant I2C
     if (i2c == NULL)
         qDebug("CCapteurI2cHmc5883_Comp: Pb init I2C");
-
+    else qDebug() << "CCapteurI2cHmc5883_Comp: adresse " << mAddrW;
     // init du composant I2C
     unsigned char buf[]={//0x00, // n° du registre config regA
-                          0x71, // valeur Config Reg A
+                          0x70, // valeur Config Reg A
                           0xA0, // Config Reg B
                           0x00  // mode register
                          };
@@ -79,11 +79,11 @@ int CCapteurI2cHmc5883_Comp::lireMesure(float &declinz, short &inclinx,short &in
     usleep(70000);
     res = i2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
     inclinx = (axe[0]<<8) + axe[1];
-    incliny = (axe[2]<<8) + axe[3];
-    inclinz = (axe[4]<<8) + axe[5];
+    inclinz = (axe[2]<<8) + axe[3];
+    incliny = (axe[4]<<8) + axe[5];
 
     // calcul de l'angle de déclinaison
-    resarc = atan2(inclinx,inclinz); // résultat en radian
+    resarc = atan2(incliny,inclinx); // résultat en radian
     if(resarc < 0)
         resarc += 2*PI;
     if(resarc > 2*PI)

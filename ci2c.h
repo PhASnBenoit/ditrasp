@@ -2,6 +2,8 @@
 #define CI2C_H
 
 #include <QObject>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QDebug>
 #include <stdio.h>
 #include <unistd.h>				//Needed for I2C port
@@ -21,6 +23,7 @@ public:
     int ecrire(unsigned char addr, unsigned char *buffer, int lg);
     int init();
     int getNbLink();
+    QMutex mutexI2c;
 
 private:
     explicit CI2c(QObject *parent = 0, char noBus = '1');

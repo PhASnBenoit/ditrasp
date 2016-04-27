@@ -3,9 +3,9 @@
 
 #include <QSharedMemory>
 
-#define NOMFIC "dit"  // pour générer la clef de la file de messages
+#define NOMFIC "./ditRasp"  // pour générer la clef de la file de messages
 #define LETTRE 'd'    // pour générer la clef de la file de messages
-#define KEY "dit"     // clef pour le segment de mémoire partagé
+#define KEY "./ditRasp"     // clef pour le segment de mémoire partagé
 #define AFFMAX 50      // long max de la valeur de la mesure
 #define NBMAXCAPT 9     // Nb max de capteurs sur le drone (9 affichage au max d'incrustation)
 

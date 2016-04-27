@@ -15,9 +15,12 @@ int CI2c::lire(unsigned char addr,  unsigned char *buffer, int lg)
         qDebug("Erreur ioctl acces au bus I2C");
         return -1;
     } // if ioctl
-    buffer[0] = buffer[1] = 0;
+    buffer[0] = buffer[1] = buffer[2] = buffer[3] = buffer[4] = buffer[5] = 0;
+
+    QMutexLocker lock(&this->mutexI2c);  // verrouillage du mutex. Il est libéré en sortie de méthode
+
     int nb=read(mFileI2c, buffer, lg);
-    qDebug() << "CI2c buffer : " << buffer[0] << " " << buffer[1];
+    qDebug() << "CI2c buffer : " << buffer[0] << " " << buffer[1] << buffer[2] << " " << buffer[3] << buffer[4] << " " << buffer[5];
     return nb;
 } // lire
 
@@ -27,6 +30,9 @@ int CI2c::ecrire(unsigned char addr, unsigned char *buffer, int lg)
         qDebug("Erreur ioctl acces au bus I2C");
         return -1;
     } // if ioctl
+
+    QMutexLocker lock(&this->mutexI2c);  // verrouillage du mutex. Il est libéré en sortie de méthode
+
     int nb=write(mFileI2c, buffer, lg);
     return nb;
 } // ecrire
