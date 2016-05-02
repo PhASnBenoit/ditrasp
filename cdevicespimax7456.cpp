@@ -27,19 +27,23 @@ int CDeviceSpiMax7456::init()
 {
     unsigned char com[2];
     unsigned char ch;
+    int res=0;
 
     // init du composant d'incrustation
     com[0] = VM0; com[1]=0x48;  // PAL
-    mSpi->ecrire(com,2);
+    res = mSpi->ecrire(com,2);
+    if (res != 2) qDebug() << "CDeviceSpiMax7456:init: Pb Ecriture";
     usleep(1000);
     com[0] = OSDBL|READ;  // pour lecture
-    mSpi->ecrire(com,1);
+    res = mSpi->ecrire(com,1);
+    if (res != 1) qDebug() << "CDeviceSpiMax7456:init: Pb Ecriture";
     usleep(1000);
-    mSpi->lire1octet(&ch);
+    res = mSpi->lire1octet(&ch);
+    if (res != 1) qDebug() << "CDeviceSpiMax7456:init: Pb lecture";
     usleep(1000);
-    com[1] = ch & 0xEF;  // mettre à 0 bit 4
-    com[0] = OSDBL;
-    mSpi->ecrire(com,2); // automatique black level
+    com[0] = OSDBL; com[1] = ch & 0xEF;  // mettre à 0 bit 4
+    res = mSpi->ecrire(com,2); // automatique black level
+    if (res != 2) qDebug() << "CDeviceSpiMax7456:init: Pb Ecriture";
     usleep(1000);
     return 1;
 } // init
@@ -49,25 +53,30 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
     const int cMax = 30;
     unsigned char reg=0;
     unsigned char com[2];
+    int res;
 
     com[0] = DMM; com[1]=0x00; // 16 bits
-    mSpi->ecrire(com,2);
+    res=mSpi->ecrire(com,2);
+    if (res != 2) qDebug() << "CDeviceSpiMax7456:printRC:1: Pb Ecriture";
     usleep(1000);
 
     int dispMemAddr = r*cMax+c;
-  //  qDebug() << "CDeviceSpiMax7456 : " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
+//    int dispMemAddr = 60;
+    qDebug() << "CDeviceSpiMax7456:printRC: " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
 
     while(*mes!=0) {  // on effectue la boucle jusqu'à la fin de la chaine (caractère NULL)
-        (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si nécessaire
+        (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si adresse affichage dépasse 255
         com[0]=DMAH; com[1]=reg;
-        mSpi->ecrire(com,2); // MSB de la position d'affichage
+        res=mSpi->ecrire(com,2); // MSB de la position d'affichage
+        if (res != 2) qDebug() << "CDeviceSpiMax7456:printRC:2: Pb Ecriture";
         usleep(1000);
 
-        com[0]=DMAL; com[1] = dispMemAddr&OCTET_BAS; // partie basse de l'adresse
-        mSpi->ecrire(com,2); // Adresse de base d'affichage
+        com[0]=DMAL; com[1] = (unsigned char)(dispMemAddr&OCTET_BAS); // partie basse de l'adresse
+        res=mSpi->ecrire(com,2); // Adresse de base d'affichage
+        if (res != 2) qDebug() << "CDeviceSpiMax7456:printRC:3: Pb Ecriture";
         usleep(1000);
 
-        com[0]=DMDI; com[1]=0x42; // caractère ? dans le référentiel MAX7456
+        com[0]=DMDI; com[1]=0x42; // caractère '?' dans le référentiel MAX7456
         if (islower(*mes)) com[1]=*mes-0x3C; // adresse du car dans le référentiel MAX7456
         if (isupper(*mes)) com[1]=*mes-0x36;
         if (isdigit(*mes)) com[1]=*mes-0x30;
@@ -88,7 +97,8 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
         case '>': com[1]=0x4B; break;
         case '@': com[1]=0x4C; break;
         }; // sw
-        mSpi->ecrire(com,2);
+        res=mSpi->ecrire(com,2);
+        if (res != 2) qDebug() << "CDeviceSpiMax7456:printRC:4: Pb Ecriture";
         usleep(1000);
 //        qDebug() << "caractère : " << *mes;
         mes++; // car suivant
@@ -101,14 +111,20 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
 
 int CDeviceSpiMax7456::effaceEcran()
 {
+    int res;
     unsigned char reg=0;
     unsigned char com[2];
-    com[1]=DMM|READ;
-    mSpi->ecrire(com,1);  // demande de lecture de DMM
-    mSpi->lire1octet(&reg);   // lecture de DMM
+    com[0]=DMM|READ;
+    res=mSpi->ecrire(com,1);  // demande de lecture de DMM
+    if (res != 1) qDebug() << "CDeviceSpiMax7456:effaceEcran:2: Pb Ecriture";
+    usleep(1000);
+    res=mSpi->lire1octet(&reg);   // lecture de DMM
+    if (res != 1) qDebug() << "CDeviceSpiMax7456:effaceEcran:1 Pb Lecture";
     com[0] = DMM;
     com[1] = reg | CLEAR_DISPLAY;
-    mSpi->ecrire(com,2);
-    usleep(20);  // temps d'effacement
+    usleep(1000);
+    res=mSpi->ecrire(com,2);
+    if (res != 2) qDebug() << "CDeviceSpiMax7456:effaceEcran:2: Pb Ecriture";
+    usleep(100);  // temps d'effacement typiquement 20us
     return 1;
 } // effaceEcran

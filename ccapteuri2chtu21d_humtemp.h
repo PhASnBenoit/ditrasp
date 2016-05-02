@@ -15,9 +15,9 @@ private:
     int mNum;
     QSharedMemory *mShm;
     T_Mes *mData;   // pointeur du segment de mémoire partagé
+    CI2c *i2c;
     float lireMesureHum();
     float lireMesureTemp();
-    CI2c *i2c;
     unsigned char mAddr;
     bool arret;
 

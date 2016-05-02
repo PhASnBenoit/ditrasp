@@ -7,16 +7,16 @@ CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, un
     mNum = no;  // numéro de la mesure du fichier config.ini
     mAddr = addr;
 
-    unsigned char buf=0;
+    unsigned char init[] = {0xE6, 0x03};
 
     i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
     if (i2c == NULL)
         qDebug("CCapteurI2cHtu21d_HumTemp: Pb init I2C");
 
-    // INIT HTD21D A FAIRE
-    res = i2c->ecrire(mAddr, &buf, 1);
+    // INIT HTU21D A FAIRE
+    res = i2c->ecrire(mAddr, init, 2);
 
-    if (res != 1) qDebug("CCapteurI2cHtu21d_HumTemp: pb ecriture");
+    if (res != 2) qDebug("CCapteurI2cHtu21d_HumTemp: pb ecriture");
     usleep(250000);
 
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
@@ -60,39 +60,41 @@ void CCapteurI2cHtu21d_HumTemp::stop()
 float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
 {
     float hum;
-    unsigned char mes[2];
+    unsigned char lecture[2];
+    unsigned char ecriture=0xE5;
     char aff[50];
     int res;
 
-    res = i2c->lire(mAddr, mes, 2);
+    i2c->ecrire(mAddr, &ecriture, 1);
+    usleep(100000);
+    res=i2c->lire(mAddr, lecture, 2);
     if (res != 2)
         qDebug() << "CCapteurI2cHtu21d_HumTemp:lireMesureHum res=" << res;
-    unsigned char msb = mes[0];
-    unsigned char lsb = mes[1];
-    sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X",res, msb, lsb);
-    qDebug(aff);
-
-    // CONVERSION A FAIRE
-    hum = ((((msb&0x7F)<<8) | lsb) >> 3)*0.0625;  // conversion
-    //if(msb&0x80) temp-= temp;  // si signe négatif
+    unsigned char MSB = lecture[0];
+    unsigned char LSB = lecture[1];
+    hum = -6+125*(MSB*256+LSB)/65536;
+    sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Hum:%3.1f",res, MSB, LSB, hum);
+    qDebug() << aff;
     return hum;
 }
 
 float CCapteurI2cHtu21d_HumTemp::lireMesureTemp()
 {
     float temp;
-    unsigned char mes[2];
+    unsigned char lecture[2];
+    unsigned char ecriture=0xE3;
     char aff[50];
     int res;
 
-    res = i2c->lire(mAddr, mes, 2);
+    i2c->ecrire(mAddr, &ecriture, 1);
+    usleep(100000);
+    res=i2c->lire(mAddr, lecture, 2);
     if (res != 2)
         qDebug() << "CCapteurI2cHtu21d_HumTemp:lireMesureTemp res=" << res;
-    unsigned char msb = mes[0];
-    unsigned char lsb = mes[1];
-    sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X",res, msb, lsb);
-    qDebug(aff);
-    temp = ((((msb&0x7F)<<8) | lsb) >> 3)*0.0625;  // conversion
-    if(msb&0x80) temp-= temp;  // si signe négatif
+    unsigned char MSB = lecture[0];
+    unsigned char LSB = lecture[1];
+    temp = -46.85+175.72*(MSB*256+LSB)/65536;
+    sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Temp:%3.1f",res, MSB, LSB, temp);
+    qDebug() << aff;
     return temp;
 }

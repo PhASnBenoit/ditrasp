@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
         // TO DO Here : autre définition de capteur
 
         if (inconnu==true)
-            qDebug("Classe du capteur inconnu !");
+            qDebug() << "MainWindow: Classe du capteur inconnu !";
         data++; // on passe à l'espace mémoire suivant
     } // for
 

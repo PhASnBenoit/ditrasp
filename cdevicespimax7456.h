@@ -26,7 +26,6 @@ enum regs_max7456 {
     CMAL,  // write address
     CMDI,  // write address
     OSDM,  // write address
-
     RB0=0x10,   // write address
     RB1,    // write address
     RB2,    // write address
@@ -44,7 +43,6 @@ enum regs_max7456 {
     RB14,   // write address
     RB15,   // write address
     OSDBL=0x6C, // write address
-
     STAT=0xA0,  // read address only
     DMDO=0xB0,  // read address only
     CMDO=0xC0   // read address only

@@ -8,6 +8,7 @@ CMsg::CMsg(QObject *parent) :
 
 CMsg::~CMsg()
 {
+    detruire();
 } // destructeur
 
 int CMsg::initialiser(const char *nomFic, int id)

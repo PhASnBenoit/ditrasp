@@ -40,12 +40,16 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     int *pNoMes = &mMessInc.hg;  // pointe sur la première position dans la structure du message
     for(int i=0 ; i<mNbCapteur ; i++) {
         *pNoMes = mData[i].noMes;
-        qDebug() << "CIncruster i " << i << "MessInc " << *pNoMes;
+        qDebug() << "CIncruster: i=" << i << " MessInc=" << *pNoMes;
+        pNoMes++;
+    } // for
+    for(int i=mNbCapteur ; i<NBMAXCAPT ; i++) { // init des autres positions à -1
+        *pNoMes = -1;
         pNoMes++;
     } // for
     // envoi du message pour mise à jour de l'affichage
-    mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal capté par ce même objet
-    qDebug("CIncruster envoi d'un message!");
+    mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal
+    qDebug("CIncruster: envoi d'un message!");
 
     // démarrage du raffraichissement des valeurs incrustées
     mTimer = new QTimer(this);
@@ -84,7 +88,7 @@ void CIncruster::majAff()
             strcpy(pA->texte, mData[*pI].valMes);  // accès à la mémoire partagée
             strcat(pA->texte, mData[*pI].symbUnit);
             mShm->unlock();
- //           qDebug() << "CIncruster Mesure : " << pA->texte;
+            qDebug() << "CIncruster:majAff: Mesure : " << pA->texte;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
@@ -96,16 +100,16 @@ void CIncruster::onMessReady(long type)
 {
     int res;
 
-    qDebug("PC_Incruste : Un message est arrivé");
+    qDebug("CIncruster:onMessReady: Un message est arrivé");
     switch (type) {
     case TYPE_MESS_INCRUSTER:  // modification des paramètres à afficher
-        qDebug("CIncruster: nouveaux params d'incrustation");
+        qDebug("CIncruster:onMessReady: nouveaux params d'incrustation");
         res =  mMsg->getMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // lecture du message arrivé
         if (res < 0)
-           qDebug("Erreur extraction du message !");
+           qDebug() << "CIncruster:onMessReady: Erreur extraction du message !";
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
-        qDebug("CIncruster: nouveaux params timer");
+        qDebug("CIncruster:onMessReady: nouveaux params timer");
         T_MessIntTimer mess;
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
         mTimer->stop();
@@ -113,7 +117,7 @@ void CIncruster::onMessReady(long type)
         mTimer->start();
         break;
     default:
-        qDebug("CIncruster : Signal non destiné");
+        qDebug("CIncruster:onMessReady: Signal non destiné à cet objet.");
         break;
     } // sw
 } // onMessReady
