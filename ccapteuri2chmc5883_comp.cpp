@@ -15,12 +15,12 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
         qDebug("CCapteurI2cHmc5883_Comp: Pb init I2C");
     else qDebug() << "CCapteurI2cHmc5883_Comp: adresse " << mAddrW;
     // init du composant I2C
-    unsigned char buf[]={//0x00, // n° du registre config regA
+    unsigned char buf[]={0x00, // n° du registre config regA
                           0x70, // valeur Config Reg A
                           0xA0, // Config Reg B
                           0x00  // mode register
                          };
-    res = i2c->ecrire(mAddrW, buf, 3);
+    res = i2c->ecrire(mAddrW, buf, 4);
     usleep(200000);
     qDebug() << "HMC5883: nb car ecrits : " << res;
     if (res == -1) qDebug("CCapteurI2cHmc5883_Comp: pb ecriture");
@@ -51,10 +51,13 @@ void CCapteurI2cHmc5883_Comp::run()
         // écriture de la mesure dans le segment de mémoire partagé
         lireMesure(declinz, inclinx, incliny, inclinz); // conversions incluses
         char chMes[50];
-        sprintf(chMes,"Angle:%3.1f X:%d, Y:%d, Z=%d",declinz, inclinx, incliny, inclinz);
+//        sprintf(chMes,"Angle:%3.1f X:%d, Y:%d, Z=%d",declinz, inclinx, incliny, inclinz);
+        sprintf(chMes,"Angle:%3.1f",declinz);
         qDebug() << "CCapteurI2cHmc5883_Comp, run angle : " << chMes;
         mShm->lock(); // on réserve la mémoire partagée
-        strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
+        T_Mes *mess = (T_Mes *)mData;
+        while (mess->noMes != mNum) mess++;
+        strcpy(mess->valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
         usleep(250000);
     } // while

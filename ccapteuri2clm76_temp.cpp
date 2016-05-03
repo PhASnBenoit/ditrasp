@@ -44,7 +44,9 @@ void CCapteurI2cLm76_Temp::run()
         char chMes[15];
         sprintf(chMes,"%3.1f",mesure);
         mShm->lock(); // on prend la mémoire partagée
-        strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
+        T_Mes *mess = (T_Mes *)mData;
+        while (mess->noMes != mNum) mess++;
+        strcpy(mess->valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
 //        qDebug(chMes);
         sleep(1); // lecture toutes les s

@@ -10,7 +10,7 @@
 #include "cdevicespimax7456.h"
 
 typedef struct {
-    char texte[30]; // ce champs doit rester en premier !
+    char texte[50]; // ce champs doit rester en premier !
     int r,c;  // column, row
 } T_Aff;
 

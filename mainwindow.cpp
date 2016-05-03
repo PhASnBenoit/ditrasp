@@ -145,7 +145,7 @@ void MainWindow::on_pbLireMessage_clicked()
     strcat(ordre.ordre, "/");
     int pos = ui->cbApp->currentText().indexOf(' ');
     strcat(ordre.ordre, ui->cbApp->currentText().left(pos).toStdString().c_str());
-    strcat(ordre.ordre,"?t=Tototom384&p=%");
+    strcat(ordre.ordre,"?t=goprohero&p=%");
     strcat(ordre.ordre, ui->cbVal->currentText().toStdString().c_str());
     strcat(ordre.ordre, " HTTP/1.1\r\n\r\n"); // fin d'entête requête HTTP
     msg->sendMessage(TYPE_MESS_ORDRE_CAMERA, &ordre, sizeof(ordre));
@@ -156,7 +156,7 @@ void MainWindow::onTimer()
     T_Mes *data = (T_Mes *)shm->constData();
     shm->lock();
     for(int i=0 ; i<nbMesure ; i++) {
-        switch(i) {
+        switch(data[i].noMes) {
         case 0: ui->lCapteur1->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
         case 1: ui->lCapteur2->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
         case 2: ui->lCapteur3->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;

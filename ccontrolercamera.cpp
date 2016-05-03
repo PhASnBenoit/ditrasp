@@ -6,7 +6,7 @@ CControlerCamera::CControlerCamera(QObject *parent, CMsg *msg) :
     // paramètre de connexion à la gopro
     mPort=80;
     mAdrIP = QHostAddress(QString("10.5.5.9"));
-    mMdp = "Tototom384";
+    mMdp = "goprohero";
     mSock = new QTcpSocket(this);
     connect(mSock, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
     connect(mSock, SIGNAL(connected()), this, SLOT(onConnected()));
