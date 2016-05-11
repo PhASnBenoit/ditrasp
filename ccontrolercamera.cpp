@@ -12,7 +12,7 @@ CControlerCamera::CControlerCamera(QObject *parent, CMsg *msg) :
     connect(mSock, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(mSock, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 
-    pMsg = msg;
+    mMsg = msg;
 
     qDebug("CControlerCamera démarre !");
 } // constructeur
@@ -28,7 +28,7 @@ void CControlerCamera::onMessReady(long type)
     T_MessOrdre mess;
     switch (type) {
     case TYPE_MESS_ORDRE_CAMERA:
-        res =  pMsg->getMessage(TYPE_MESS_ORDRE_CAMERA, &mess, sizeof(T_MessOrdre));
+        res =  mMsg->getMessage(TYPE_MESS_ORDRE_CAMERA, &mess, sizeof(T_MessOrdre));
         if (res < 0)
            qDebug("Erreur extraction du message !");
         mSock->connectToHost(mAdrIP,mPort);

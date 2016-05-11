@@ -22,15 +22,18 @@ public:
     ~CCommuniquer();
 
 private:
-    QObject *pParent;
-    CMsg *pMsg;
+    QObject *mParent;
+    CMsg *mMsg;
     QSerialPort *mPs;
     QFile *mFileCsv;
-    QTimer *timer;
+    QTimer *mTimer;
     QSharedMemory *mShm;
     T_Mes *mData;   // pointeur du segment de mémoire partagé
-    int initPs(QSerialPort *mPs);
+    int mTimerMesures;
+
+    int initPs(QSerialPort *serial);
     int protocole();
+    US crc16(UC *tab, int nb);
 
 signals:
 

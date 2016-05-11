@@ -27,22 +27,24 @@ void CCapteurSerialGps::run()
     QByteArray latitude, longitude;
     QString mesure;
 
-    arret=false;
-    while(!arret) {
+    mArret=false;
+    while(!mArret) {
         qDebug() << "GPS thread running !";
         lireMesure(latitude, longitude);
         mesure = "Lat:"+QString(latitude)+" Long:"+QString(longitude);
         qDebug() << "GPS: " << mesure;
         // sauvegarde dans la mémoire partagée
+        T_Mes *mess = (T_Mes *)mData;
+        while (mess->noMes != mNum) mess++;
         mShm->lock();
-          strncpy(mData[mNum].valMes, mesure.toStdString().c_str(), sizeof(mData[mNum].valMes));
+          strncpy(mess->valMes, mesure.toStdString().c_str(), sizeof(mess->valMes));
         mShm->unlock();
     } // while
 }
 
 void CCapteurSerialGps::stop()
 {
-    arret=true;
+    mArret=true;
 } // run
 
 int CCapteurSerialGps::lireMesure(QByteArray &latitude, QByteArray &longitude)

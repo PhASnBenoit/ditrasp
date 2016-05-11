@@ -47,11 +47,11 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
     mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal
     qDebug("CIncruster: envoi d'un message!");
 
-    // démarrage du raffraichissement des valeurs incrustées
+    // timer d'interval d'incrustation
     mTimer = new QTimer(this);
-    mTimer->setInterval(interval);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    mTimer->start();
+    mTimer->setInterval(interval); // valeur par défaut
+
 } // constructeur
 
 CIncruster::~CIncruster()
@@ -62,6 +62,20 @@ CIncruster::~CIncruster()
    mShm->detach();
    delete mShm;
 } // destructeur
+
+void CIncruster::start()
+{
+    // démarrage du raffraichissement des valeurs incrustées
+    mTimer->start();
+
+} // start
+
+void CIncruster::stop()
+{
+    // démarrage du raffraichissement des valeurs incrustées
+    mTimer->stop();
+    mMax->effaceEcran(); // vide écran vidéo des incrustations
+} // stop
 
 void CIncruster::razAff()
 {
@@ -76,17 +90,21 @@ void CIncruster::majAff()
     T_Mes *mess;
     int *pI = &mMessInc.hg;  // pointe sur les mesures autorisées
     T_Aff *pA = &mAffInc.hg;  // pointe sur la structure d'incrustation
-    //mMax->effaceEcran();
 
     // modifier les valeurs d'incrustation
+    static bool flag=true;
     for (int i=0 ; i<NBMAXCAPT ; i++) { // pour tous les capteurs dans le message
+        (flag==true?flag=false:flag=true);
         if (*pI != -1) {
             mess = (T_Mes *)mData;
             while(mess->noMes != *pI) mess++;
             mShm->lock();
             strcpy(pA->texte, mess->valMes);  // accès à la mémoire partagée
             strcat(pA->texte, mess->symbUnit);
-            strcat(pA->texte, "    ");
+            if (flag)
+                strcat(pA->texte, "     ");
+            else
+                strcat(pA->texte, "  @  ");
             mShm->unlock();
             qDebug() << "--CIncruster:majAff:pI=" << *pI << " pA=" << pA->texte << " mess.noMes=" << mess->noMes;
             mMax->printRC(pA->texte, pA->r, pA->c);
@@ -107,14 +125,18 @@ void CIncruster::onMessReady(long type)
         res =  mMsg->getMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // lecture du message arrivé
         if (res < 0)
            qDebug() << "CIncruster:onMessReady: Erreur extraction du message !";
+        else {
+            // traiter les nouveaux params à incruster
+        } // else
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
         qDebug("CIncruster:onMessReady: nouveaux params timer");
         T_MessIntTimer mess;
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
-        mTimer->stop();
+        stop();
         mTimer->setInterval(mess.interval);
-        mTimer->start();
+        if (mess.enable)
+            start();
         break;
     default:
         qDebug("CIncruster:onMessReady: Signal non destiné à cet objet.");

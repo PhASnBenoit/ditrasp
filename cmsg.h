@@ -52,6 +52,7 @@ typedef struct {
 typedef struct {
     long type;
     int interval;
+    bool enable; // pour start ou stop timer
 } T_MessIntTimer;
 
 /////////////////////////////////////////////////////////////////////////////

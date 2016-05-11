@@ -56,7 +56,7 @@ public:
     ~CControlerCamera();
 
 private:
-    CMsg *pMsg; //
+    CMsg *mMsg; //
     QHostAddress mAdrIP;     // adr IP de la caméra
     int mPort;
     QString mMdp;            // Mot de passe WIFI

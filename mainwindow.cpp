@@ -96,10 +96,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if (nbMesure > 0) {
        // lancement du timer de mise à jour des mesures dans l'IHM
+       // optionnel !!! seulement pour test
        timer = new QTimer(this);
        timer->setInterval(500);
        connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
        timer->start();
+
+       // creation de l'objet incrustation
        pc_inc = new CIncruster(this, msg, 1000); // 1000ms d'actualisation de l'incrustation
        connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
     } // if nbMesure

@@ -27,5 +27,6 @@ int CSerialPort::lireLigne(QByteArray &qba)
 
 int CSerialPort::initPS()
 {
+
     return 1;
 } // destructeur

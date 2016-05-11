@@ -44,6 +44,8 @@ private:
     T_MessInc mMessInc;  // contient les no de mesures à afficher et position
     CDeviceSpiMax7456 *mMax;
 
+    void start();
+    void stop();
     void razAff();
     void majAff();
 signals:

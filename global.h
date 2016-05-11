@@ -9,6 +9,9 @@
 #define AFFMAX 50      // long max de la valeur de la mesure
 #define NBMAXCAPT 9     // Nb max de capteurs sur le drone (9 affichage au max d'incrustation)
 
+typedef unsigned char UC;
+typedef unsigned short US;
+
 // structure du fichier de configuration config.ini
 typedef struct {
     int noMes;              // numéro de la mesure
