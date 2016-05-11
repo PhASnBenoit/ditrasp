@@ -15,11 +15,11 @@ private:
     int mNum;
     QSharedMemory *mShm;
     T_Mes *mData;   // pointeur du segment de mémoire partagé
-    CI2c *i2c;
+    CI2c *mI2c;
+    unsigned char mAddr;
+    bool mArret;
     float lireMesureHum();
     float lireMesureTemp();
-    unsigned char mAddr;
-    bool arret;
 
 public:
     explicit CCapteurI2cHtu21d_HumTemp(QObject *parent=0, int no=0, unsigned char addr=0x40);

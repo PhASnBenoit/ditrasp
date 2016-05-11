@@ -20,6 +20,7 @@ public:
     // creation destruction de l'objet
     static CI2c *getInstance(QObject *parent = 0, char no = '1');
     static void freeInstance();
+
     int lire(unsigned char addr, unsigned char *buffer, int lg);
     int ecrire(unsigned char addr, unsigned char *buffer, int lg);
     int init();

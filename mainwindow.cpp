@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
          } // if
     } // while
 
-    msg = new CMsg(this);  // instanciation de la file de messages
-    int res = msg->initialiser(NOMFIC, (int)LETTRE);
+    mMsg = new CMsg(this);  // instanciation de la file de messages
+    int res = mMsg->initialiser(NOMFIC, (int)LETTRE);
     if (res==-1) {
         qDebug("Erreur init file de message !");
     } // if res
@@ -41,51 +41,51 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qDebug() << "Main:" << nbLigne << "capteurs vus";
     // création du segment de mémoire partagé contenant la description des capteurs et les valeurs instantanées
-    shm = new QSharedMemory(KEY, this);
-    shm->attach();   // tentative de s'attacher
-    if (!shm->isAttached()) {   // si existe pas alors création
-        res = shm->create(nbLigne*sizeof(T_Mes));
+    mShm = new QSharedMemory(KEY, this);
+    mShm->attach();   // tentative de s'attacher
+    if (!mShm->isAttached()) {   // si existe pas alors création
+        res = mShm->create(nbLigne*sizeof(T_Mes));
         if (res == false)
-            qDebug(shm->errorString().toStdString().c_str());
+            qDebug(mShm->errorString().toStdString().c_str());
     } // if isattached
     // sauvegarde en mémoire partagée et instanciation des objets threads de lecture des mesures
-    T_Mes *data = (T_Mes *)shm->data();
+    T_Mes *data = (T_Mes *)mShm->data();
 
-    nbMesure=0;
+    mNbMesure=0;
     for(int i=0 ; i<nbLigne ; i++) {
         bool inconnu=true;                          // le capteur par défaut n'est pas reconnu
         memcpy(data, &mesures.at(i), sizeof(T_Mes));
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cLm76_Temp", sizeof("CCapteurI2cLm76_Temp"))) {
             qDebug("Capteur LM76 Temp reconnu !");
-            capteurs.append(new CCapteurI2cLm76_Temp(this, mesures.at(i).noMes,  0x48));  // le thread est créé mais n'est pas lancé
-            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cLm76_Temp *)capteurs.at(i), SLOT(stop()));
-            capteurs.at(i)->start();                   // lancement du thread
+            mCapteurs.append(new CCapteurI2cLm76_Temp(this, mesures.at(i).noMes,  0x48));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cLm76_Temp *)mCapteurs.at(i), SLOT(stop()));
+            mCapteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
-            nbMesure++;
+            mNbMesure++;
         } // if LM76
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHmc5883_Comp", sizeof("CCapteurI2cHmc5883_Comp"))) {
             qDebug("Capteur Compas HMC5883 reconnu !");
-            capteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes, 0x1E));  // le thread est créé mais n'est pas lancé
-            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cHmc5883_Comp *)capteurs.at(i), SLOT(stop()));
-            capteurs.at(i)->start();                   // lancement du thread
+            mCapteurs.append(new CCapteurI2cHmc5883_Comp(this, mesures.at(i).noMes, 0x1E));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cHmc5883_Comp *)mCapteurs.at(i), SLOT(stop()));
+            mCapteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
-            nbMesure++;
+            mNbMesure++;
         } // if 5883
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurI2cHtu21d_HumTemp", sizeof("CCapteurI2cHtu21d_HumTemp"))) {
             qDebug("Capteur Humidité et température HTU21D reconnu !");
-            capteurs.append(new CCapteurI2cHtu21d_HumTemp(this, mesures.at(i).noMes, 0x40));  // le thread est créé mais n'est pas lancé
-            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cHtu21d_HumTemp *)capteurs.at(i), SLOT(stop()));
-            capteurs.at(i)->start();                   // lancement du thread
+            mCapteurs.append(new CCapteurI2cHtu21d_HumTemp(this, mesures.at(i).noMes, 0x40));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurI2cHtu21d_HumTemp *)mCapteurs.at(i), SLOT(stop()));
+            mCapteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
-            nbMesure++;
+            mNbMesure++;
         } // if 5883
         if (!strncmp(mesures.at(i).nomClasse, "CCapteurSerialGps", sizeof("CCapteurSerialGps"))) {
             qDebug("Capteur GPS reconnu !");
-            capteurs.append(new CCapteurSerialGps(this, "/dev/ttyAMA0", mesures.at(i).noMes, 9600, 'N', 8));  // le thread est créé mais n'est pas lancé
-            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurSerialGps *)capteurs.at(i), SLOT(stop()));
-            capteurs.at(i)->start();                   // lancement du thread
+            mCapteurs.append(new CCapteurSerialGps(this, "/dev/ttyAMA0", mesures.at(i).noMes, 9600, 'N', 8));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurSerialGps *)mCapteurs.at(i), SLOT(stop()));
+            mCapteurs.at(i)->start();                   // lancement du thread
             inconnu = false;                           // la mesure est connue
-            nbMesure++;
+            mNbMesure++;
         } // if GPS
         // TO DO Here : autre définition de capteur
 
@@ -94,43 +94,44 @@ MainWindow::MainWindow(QWidget *parent) :
         data++; // on passe à l'espace mémoire suivant
     } // for
 
-    if (nbMesure > 0) {
+    if (mNbMesure > 0) {
        // lancement du timer de mise à jour des mesures dans l'IHM
        // optionnel !!! seulement pour test
-       timer = new QTimer(this);
-       timer->setInterval(500);
-       connect(timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-       timer->start();
+       mTimer = new QTimer(this);
+       mTimer->setInterval(500);
+       connect(mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+       mTimer->start();
 
        // creation de l'objet incrustation
-       pc_inc = new CIncruster(this, msg, 1000); // 1000ms d'actualisation de l'incrustation
-       connect(msg, SIGNAL(mailReady(long)), pc_inc, SLOT(onMessReady(long)));
+       mCInc = new CIncruster(this, mMsg, 1000); // 1000ms d'actualisation de l'incrustation
+       connect(mMsg, SIGNAL(mailReady(long)), mCInc, SLOT(onMessReady(long)));
     } // if nbMesure
 
     // création des objets et connexions à la file des messages
-    connect(msg, SIGNAL(mailReady(long)), this, SLOT(onMessReady(long)));
-    pc_contcam = new CControlerCamera(this, msg);
-    connect(msg, SIGNAL(mailReady(long)), pc_contcam, SLOT(onMessReady(long)));
-    pc_com = new CCommuniquer(this, msg);
-    connect(msg, SIGNAL(mailReady(long)), pc_com, SLOT(onMessReady(long)));
+    connect(mMsg, SIGNAL(mailReady(long)), this, SLOT(onMessReady(long)));
+    mCCam = new CControlerCamera(this, mMsg);
+    connect(mMsg, SIGNAL(mailReady(long)), mCCam, SLOT(onMessReady(long)));
+
+    mCCom = new CCommuniquer(this, mMsg);
+    connect(mMsg, SIGNAL(mailReady(long)), mCCom, SLOT(onMessReady(long)));
 } // constructeur
 
 MainWindow::~MainWindow()
 {
     emit arretThreadsCapteur();
     CI2c::freeInstance(); // libère la mémoire du singleton
-    timer->stop();
-    for(int i=0 ; i<capteurs.size() ; i++) {
-        delete capteurs.at(i);
+    mTimer->stop();
+    for(int i=0 ; mCapteurs.size() ; i++) {
+        delete mCapteurs.at(i);
     } // for
-    delete timer;
-    delete pc_com;
-    delete pc_contcam;
-    delete pc_inc;
-    shm->detach();
-    delete shm;
-    msg->detruire();
-    delete msg;
+    delete mTimer;
+    delete mCCom;
+    delete mCCam;
+    delete mCInc;
+    mShm->detach();
+    delete mShm;
+    mMsg->detruire();
+    delete mMsg;
     delete ui;
 } // destructeur
 
@@ -142,6 +143,7 @@ void MainWindow::onMessReady(long type)
 
 void MainWindow::on_pbLireMessage_clicked()
 {
+    // envoyer depuis la RPI la commande de la camera
     T_MessOrdre ordre;
     strcpy(ordre.ordre,"GET /");
     strcat(ordre.ordre, ui->cbRep->currentText().toStdString().c_str());
@@ -151,14 +153,14 @@ void MainWindow::on_pbLireMessage_clicked()
     strcat(ordre.ordre,"?t=goprohero&p=%");
     strcat(ordre.ordre, ui->cbVal->currentText().toStdString().c_str());
     strcat(ordre.ordre, " HTTP/1.1\r\n\r\n"); // fin d'entête requête HTTP
-    msg->sendMessage(TYPE_MESS_ORDRE_CAMERA, &ordre, sizeof(ordre));
+    mMsg->sendMessage(TYPE_MESS_ORDRE_CAMERA, &ordre, sizeof(ordre));
 } // onLireMessage
 
 void MainWindow::onTimer()
 {
-    T_Mes *data = (T_Mes *)shm->constData();
-    shm->lock();
-    for(int i=0 ; i<nbMesure ; i++) {
+    T_Mes *data = (T_Mes *)mShm->constData();
+    mShm->lock();
+    for(int i=0 ; i<mNbMesure ; i++) {
         switch(data[i].noMes) {
         case 0: ui->lCapteur1->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
         case 1: ui->lCapteur2->setText(QString(data[i].textUnit)+QString(data[i].valMes)+QString(data[i].symbUnit)); break;
@@ -175,13 +177,5 @@ void MainWindow::onTimer()
             break;
         } // sw
     } // for
-    shm->unlock();
+    mShm->unlock();
 } // onTimer
-
-
-/*
-void MainWindow::on_pbQuitter_clicked()
-{
-    this->destroy();
-}
-*/

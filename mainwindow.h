@@ -32,16 +32,16 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    CMsg *msg;  // file des messages
-    QSharedMemory *shm;  // segment de mémoire partagé
+    CMsg *mMsg;  // file des messages
+    QSharedMemory *mShm;  // segment de mémoire partagé
 
-    CCommuniquer *pc_com;
-    CIncruster *pc_inc;
-    CControlerCamera *pc_contcam;
+    CCommuniquer *mCCom;
+    CIncruster *mCInc;
+    CControlerCamera *mCCam;
 
-    QList<QThread *> capteurs;   // tableau de thread des capteurs
-    QTimer *timer;
-    int nbMesure;
+    QList<QThread *> mCapteurs;   // tableau de thread des capteurs
+    QTimer *mTimer;
+    int mNbMesure;
 
 private slots:
     void onMessReady(long type);

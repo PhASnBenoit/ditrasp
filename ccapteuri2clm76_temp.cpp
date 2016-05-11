@@ -10,10 +10,10 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
     mAddr = addr;
 
     unsigned char buf=0;
-    i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
-    if (i2c == NULL)
+    mI2c = CI2c::getInstance(this, no);  // N° du fichier virtuel
+    if (mI2c == NULL)
         qDebug("CCapteurI2cLm76_Temp: Pb init I2C");
-    res = i2c->ecrire(mAddr, &buf, 1);
+    res = mI2c->ecrire(mAddr, &buf, 1);
     if (res != 1) qDebug("CCapteurI2cLm76_Temp: pb ecriture");
     usleep(250000);
 
@@ -28,7 +28,7 @@ CCapteurI2cLm76_Temp::CCapteurI2cLm76_Temp(QObject *parent, int no, unsigned cha
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 {
-    i2c->freeInstance();
+    mI2c->freeInstance();
     mShm->detach();
     delete mShm;
 } // destructeur
@@ -36,9 +36,9 @@ CCapteurI2cLm76_Temp::~CCapteurI2cLm76_Temp()
 void CCapteurI2cLm76_Temp::run()
 {
     float mesure;
-    arret=false;
 
-    while(!arret) {
+    mArret=false;
+    while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesure = lireMesure();
         char chMes[15];
@@ -48,14 +48,13 @@ void CCapteurI2cLm76_Temp::run()
         while (mess->noMes != mNum) mess++;
         strcpy(mess->valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
-//        qDebug(chMes);
         sleep(1); // lecture toutes les s
     } // while
 }
 
 void CCapteurI2cLm76_Temp::stop()
 {
-    arret=true;
+    mArret=true;
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +65,7 @@ float CCapteurI2cLm76_Temp::lireMesure()
     char aff[50];
     int res;
 
-    res = i2c->lire(mAddr, mes, 2);
+    res = mI2c->lire(mAddr, mes, 2);
     if (res != 2)
         qDebug() << "CCapteurI2cLm76_Temp:lireMesure res=" << res;
     unsigned char msb = mes[0];

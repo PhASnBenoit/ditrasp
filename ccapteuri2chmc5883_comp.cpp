@@ -10,8 +10,8 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
     mAddrW = addr;  // Adresse du module I2C en écriture
     mAddrR = mAddrW;  // adresse pour la lecture
 
-    i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel et adr du composant I2C
-    if (i2c == NULL)
+    mI2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel et adr du composant I2C
+    if (mI2c == NULL)
         qDebug("CCapteurI2cHmc5883_Comp: Pb init I2C");
     else qDebug() << "CCapteurI2cHmc5883_Comp: adresse " << mAddrW;
     // init du composant I2C
@@ -20,7 +20,7 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
                           0xA0, // Config Reg B
                           0x00  // mode register
                          };
-    res = i2c->ecrire(mAddrW, buf, 4);
+    res = mI2c->ecrire(mAddrW, buf, 4);
     usleep(200000);
     qDebug() << "HMC5883: nb car ecrits : " << res;
     if (res == -1) qDebug("CCapteurI2cHmc5883_Comp: pb ecriture");
@@ -36,7 +36,7 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 {
-    i2c->freeInstance();
+    mI2c->freeInstance();
     mShm->detach();
     delete mShm;
 } // destructeur
@@ -46,8 +46,8 @@ void CCapteurI2cHmc5883_Comp::run()
     short inclinx, incliny, inclinz;
     float declinz;
 
-    arret=false;
-    while(!arret) {
+    mArret=false;
+    while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         lireMesure(declinz, inclinx, incliny, inclinz); // conversions incluses
         char chMes[50];
@@ -65,7 +65,7 @@ void CCapteurI2cHmc5883_Comp::run()
 
 void CCapteurI2cHmc5883_Comp::stop()
 {
-    arret=true;
+    mArret=true;
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,13 +74,11 @@ int CCapteurI2cHmc5883_Comp::lireMesure(float &declinz, short &inclinx,short &in
     int res=0;
     double resarc;
     unsigned char axe[6];
-    //double daxes[3];
-//    short x,y,z;
 
     unsigned char buf=0x03; // n° du registre premier axe
-    res = i2c->ecrire(mAddrW, &buf, 1); // positionnement registre axe x msb
+    res = mI2c->ecrire(mAddrW, &buf, 1); // positionnement registre axe x msb
     usleep(70000);
-    res = i2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
+    res = mI2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
     inclinx = (axe[0]<<8) + axe[1];
     inclinz = (axe[2]<<8) + axe[3];
     incliny = (axe[4]<<8) + axe[5];
@@ -94,43 +92,4 @@ int CCapteurI2cHmc5883_Comp::lireMesure(float &declinz, short &inclinx,short &in
     declinz = (float)(resarc*180/PI);
     //declinz = (axe[4]<<8) + axe[5];
     return res;
-    /*
-    //for (int i=0 ; i<3 ; i++) {
-        res += i2c->lire(mAddrR, axe, 6);  // valeur en micro tesla
-        //daxes[i] = (double)axes[i];
-        //qDebug() << "CCapteurI2cHmc5883_Comp, lireMesure : daxe[" << i << "] : " << daxes[i];
-        usleep(1000);
-    //} // for
-
-    x=(axe[0]<<8) + axe[1];
-    y=(axe[2]<<8) + axe[3];
-    z=(axe[4]<<8) + axe[5];
-
-    qDebug() << "CCapteurI2cHmc5883_Comp, lireMesure : x = " << x << " y = " << y << " z = " << z;
-
-    // calcul de l'angle de déclinaison
-    resarc = atan2((double)x,(double) y); // résultat en radian
-    if(resarc < 0)
-        resarc += 2*PI;
-    if(resarc > 2*PI)
-        resarc -= 2*PI;
-    declinz = (float)(resarc*180/PI);
-
-    // calcul de l'angle de inclinx
-    resarc = atan2((double)y,(double) z); // résultat en radian
-    if(resarc < 0)
-        resarc += 2*PI;
-    if(resarc > 2*PI)
-        resarc -= 2*PI;
-    inclinx = (float)(resarc*180/PI);
-
-    // calcul de l'angle de incliny
-    resarc = atan2((double)x,(double) z); // résultat en radian
-    if(resarc < 0)
-        resarc += 2*PI;
-    if(resarc > 2*PI)
-        resarc -= 2*PI;
-    incliny = (float)(resarc*180/PI);
-
-    return 1;*/
 } // lireCapteur

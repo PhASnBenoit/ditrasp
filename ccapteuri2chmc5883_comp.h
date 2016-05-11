@@ -18,10 +18,10 @@ private :
     int mNum;
     QSharedMemory *mShm;
     T_Mes *mData;   // pointeur du segment de mémoire partagé
-    int lireMesure(float &declinz, short &inclinx, short &incliny, short &inclinz);
-    CI2c *i2c;
+    CI2c *mI2c;
     unsigned char mAddrW, mAddrR; // adr d'écriture et lecture
-    bool arret;
+    bool mArret;
+    int lireMesure(float &declinz, short &inclinx, short &incliny, short &inclinz);
 
 public:
     explicit CCapteurI2cHmc5883_Comp(QObject *parent = 0, int no = 0, unsigned char addr = 0x1E); // no de la mesure définit dans le fichier de config "config.ini"

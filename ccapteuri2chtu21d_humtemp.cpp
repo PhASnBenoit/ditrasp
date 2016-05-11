@@ -9,12 +9,12 @@ CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, un
 
     unsigned char init[] = {0xE6, 0x03};
 
-    i2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
-    if (i2c == NULL)
+    mI2c = CI2c::getInstance(this, '1');  // N° du fichier virtuel
+    if (mI2c == NULL)
         qDebug("CCapteurI2cHtu21d_HumTemp: Pb init I2C");
 
     // INIT HTU21D A FAIRE
-    res = i2c->ecrire(mAddr, init, 2);
+    res = mI2c->ecrire(mAddr, init, 2);
 
     if (res != 2) qDebug("CCapteurI2cHtu21d_HumTemp: pb ecriture");
     usleep(250000);
@@ -29,7 +29,7 @@ CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, un
 
 CCapteurI2cHtu21d_HumTemp::~CCapteurI2cHtu21d_HumTemp()
 {
-    i2c->freeInstance();
+    mI2c->freeInstance();
     mShm->detach();
     delete mShm;
 }
@@ -37,9 +37,9 @@ CCapteurI2cHtu21d_HumTemp::~CCapteurI2cHtu21d_HumTemp()
 void CCapteurI2cHtu21d_HumTemp::run()
 {
     float mesureHum, mesureTemp;
-    arret=false;
 
-    while(!arret) {
+    mArret=false;
+    while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesureHum = lireMesureHum();
         mesureTemp = lireMesureTemp();
@@ -56,7 +56,7 @@ void CCapteurI2cHtu21d_HumTemp::run()
 
 void CCapteurI2cHtu21d_HumTemp::stop()
 {
-    arret=true;
+    mArret=true;
 }
 
 float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
@@ -67,9 +67,9 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
     char aff[50];
     int res;
 
-    i2c->ecrire(mAddr, &ecriture, 1);
+    mI2c->ecrire(mAddr, &ecriture, 1);
     usleep(100000);
-    res=i2c->lire(mAddr, lecture, 2);
+    res=mI2c->lire(mAddr, lecture, 2);
     if (res != 2)
         qDebug() << "CCapteurI2cHtu21d_HumTemp:lireMesureHum res=" << res;
     unsigned char MSB = lecture[0];
@@ -78,7 +78,7 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
     sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Hum:%3.1f",res, MSB, LSB, hum);
     qDebug() << aff;
     return hum;
-}
+} // lireMesHum
 
 float CCapteurI2cHtu21d_HumTemp::lireMesureTemp()
 {
@@ -88,9 +88,9 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureTemp()
     char aff[50];
     int res;
 
-    i2c->ecrire(mAddr, &ecriture, 1);
+    mI2c->ecrire(mAddr, &ecriture, 1);
     usleep(100000);
-    res=i2c->lire(mAddr, lecture, 2);
+    res=mI2c->lire(mAddr, lecture, 2);
     if (res != 2)
         qDebug() << "CCapteurI2cHtu21d_HumTemp:lireMesureTemp res=" << res;
     unsigned char MSB = lecture[0];
@@ -99,4 +99,4 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureTemp()
     sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Temp:%3.1f",res, MSB, LSB, temp);
     qDebug() << aff;
     return temp;
-}
+} // lire MesTemp
