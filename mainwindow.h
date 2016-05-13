@@ -47,7 +47,7 @@ private slots:
     void onMessReady(long type);
     void on_pbLireMessage_clicked();
     void onTimer();
-    //void on_pbQuitter_clicked();
+    void onAfficherTexte(QString aff);
 
 signals:
     void arretThreadsCapteur();

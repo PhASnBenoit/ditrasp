@@ -18,6 +18,7 @@ private:
     CI2c *mI2c;
     unsigned char mAddr;
     bool mArret;
+    bool mStopped;
     float lireMesureHum();
     float lireMesureTemp();
 

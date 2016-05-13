@@ -38,6 +38,7 @@ void CCapteurI2cLm76_Temp::run()
     float mesure;
 
     mArret=false;
+    mStopped = false;
     while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesure = lireMesure();
@@ -50,11 +51,14 @@ void CCapteurI2cLm76_Temp::run()
         mShm->unlock(); // on libère la mémmoire partagée
         sleep(1); // lecture toutes les s
     } // while
+    mStopped = true;
+    //exec();
 }
 
 void CCapteurI2cLm76_Temp::stop()
 {
     mArret=true;
+    while (!mStopped);
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +75,7 @@ float CCapteurI2cLm76_Temp::lireMesure()
     unsigned char msb = mes[0];
     unsigned char lsb = mes[1];
     sprintf(aff,"CCapteurI2cLm76_Temp res=%d msb=%02X lsb=%02X",res, msb, lsb);
-    qDebug(aff);
+//    qDebug(aff);
     temp = ((((msb&0x7F)<<8) | lsb) >> 3)*0.0625;  // conversion
     if(msb&0x80) temp-= temp;  // si signe négatif
     return temp;

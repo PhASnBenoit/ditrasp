@@ -106,7 +106,7 @@ void CIncruster::majAff()
             else
                 strcat(pA->texte, "  @  ");
             mShm->unlock();
-            qDebug() << "--CIncruster:majAff:pI=" << *pI << " pA=" << pA->texte << " mess.noMes=" << mess->noMes;
+//            qDebug() << "--CIncruster:majAff:pI=" << *pI << " pA=" << pA->texte << " mess.noMes=" << mess->noMes;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
@@ -118,7 +118,7 @@ void CIncruster::onMessReady(long type)
 {
     int res;
 
-    qDebug("CIncruster:onMessReady: Un message est arrivé");
+//    qDebug("CIncruster:onMessReady: Un message est arrivé");
     switch (type) {
     case TYPE_MESS_INCRUSTER:  // modification des paramètres à afficher
         qDebug("CIncruster:onMessReady: nouveaux params d'incrustation");

@@ -18,6 +18,7 @@ private:
     T_Mes *mData;   // pointeur du segment de mémoire partagé
     CSerialPort *mPs;  // gestion du port série
     bool mArret;
+    bool mStopped;
     int lireMesure(QByteArray &latitude, QByteArray &longitude);  // retourne lat et long
 
 public:

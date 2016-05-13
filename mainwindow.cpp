@@ -114,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mCCom = new CCommuniquer(this, mMsg);
     connect(mMsg, SIGNAL(mailReady(long)), mCCom, SLOT(onMessReady(long)));
+    connect(mCCom, SIGNAL(afficherTexte(QString)), this, SLOT(onAfficherTexte(QString)));
 } // constructeur
 
 MainWindow::~MainWindow()
@@ -122,6 +123,8 @@ MainWindow::~MainWindow()
     CI2c::freeInstance(); // libère la mémoire du singleton
     mTimer->stop();
     for(int i=0 ; mCapteurs.size() ; i++) {
+        mCapteurs.at(i)->quit();
+        mCapteurs.at(i)->wait(2000);  // pour attendre que le thread se termine
         delete mCapteurs.at(i);
     } // for
     delete mTimer;
@@ -178,4 +181,9 @@ void MainWindow::onTimer()
         } // sw
     } // for
     mShm->unlock();
+}
+
+void MainWindow::onAfficherTexte(QString aff)
+{
+    ui->teTexte->append(aff);
 } // onTimer

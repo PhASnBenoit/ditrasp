@@ -34,7 +34,7 @@ void CControlerCamera::onMessReady(long type)
         mSock->connectToHost(mAdrIP,mPort);
         mSock->write(mess.ordre);
         //mSock->close();
-        qDebug(mess.ordre);
+//        qDebug(mess.ordre);
         break;
     default:
         qDebug("CControlerCamera: Message non reconnu reçu !");
@@ -46,7 +46,7 @@ void CControlerCamera::onReadyRead()
 {
     QByteArray qba;
     qba = mSock->readAll(); // lecture de l'octet de réponse (=0)
-    qDebug("Acquittement de l'ordre par la Gopro");
+//    qDebug("Acquittement de l'ordre par la Gopro");
     mSock->close();
 } // onReadyRead
 
@@ -59,4 +59,3 @@ void CControlerCamera::onDisconnected()
 {
     qDebug("Disconnected from the Gopro");
 } // onDisconnected
-

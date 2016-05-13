@@ -62,7 +62,7 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
 
     int dispMemAddr = r*cMax+c;
 //    int dispMemAddr = 60;
-    qDebug() << "CDeviceSpiMax7456:printRC: " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
+//    qDebug() << "CDeviceSpiMax7456:printRC: " << dispMemAddr << "mes=" << mes << "strlen=" << strlen(mes);
 
     while(*mes!=0) {  // on effectue la boucle jusqu'à la fin de la chaine (caractère NULL)
         (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si adresse affichage dépasse 255

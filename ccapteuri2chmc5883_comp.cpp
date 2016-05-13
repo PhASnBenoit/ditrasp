@@ -36,6 +36,7 @@ CCapteurI2cHmc5883_Comp::CCapteurI2cHmc5883_Comp(QObject *parent, int no, unsign
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 CCapteurI2cHmc5883_Comp::~CCapteurI2cHmc5883_Comp()
 {
+    stop();
     mI2c->freeInstance();
     mShm->detach();
     delete mShm;
@@ -47,13 +48,13 @@ void CCapteurI2cHmc5883_Comp::run()
     float declinz;
 
     mArret=false;
+    mStopped=false;
     while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         lireMesure(declinz, inclinx, incliny, inclinz); // conversions incluses
         char chMes[50];
-//        sprintf(chMes,"Angle:%3.1f X:%d, Y:%d, Z=%d",declinz, inclinx, incliny, inclinz);
         sprintf(chMes,"Angle:%3.1f",declinz);
-        qDebug() << "CCapteurI2cHmc5883_Comp, run angle : " << chMes;
+//        qDebug() << "CCapteurI2cHmc5883_Comp, run angle : " << chMes;
         mShm->lock(); // on réserve la mémoire partagée
         T_Mes *mess = (T_Mes *)mData;
         while (mess->noMes != mNum) mess++;
@@ -61,11 +62,14 @@ void CCapteurI2cHmc5883_Comp::run()
         mShm->unlock(); // on libère la mémmoire partagée
         usleep(250000);
     } // while
+    mStopped=true;
+    //exec();
 }
 
 void CCapteurI2cHmc5883_Comp::stop()
 {
     mArret=true;
+    while(!mStopped);
 } // run
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +94,5 @@ int CCapteurI2cHmc5883_Comp::lireMesure(float &declinz, short &inclinx,short &in
     if(resarc > 2*PI)
         resarc -= 2*PI;
     declinz = (float)(resarc*180/PI);
-    //declinz = (axe[4]<<8) + axe[5];
     return res;
 } // lireCapteur

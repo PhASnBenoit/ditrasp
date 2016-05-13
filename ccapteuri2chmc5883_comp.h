@@ -21,6 +21,7 @@ private :
     CI2c *mI2c;
     unsigned char mAddrW, mAddrR; // adr d'écriture et lecture
     bool mArret;
+    bool mStopped;
     int lireMesure(float &declinz, short &inclinx, short &incliny, short &inclinz);
 
 public:

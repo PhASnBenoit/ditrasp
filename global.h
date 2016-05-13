@@ -13,8 +13,9 @@ typedef unsigned char UC;
 typedef unsigned short US;
 
 // structure du fichier de configuration config.ini
+// Ce fichier contient toutes les mesures à incruster.
 typedef struct {
-    int noMes;              // numéro de la mesure
+    int noMes;              // numéro de la mesure qui correspond aussi à position d'incrustation
     char adrCapteur[AFFMAX];    // Adresse ou fichier d'accès au capteur
     char nomClasse[AFFMAX];     // nom de la classe de gestion du capteur
     char nomMes[AFFMAX];        // nom de la mesure
@@ -24,3 +25,5 @@ typedef struct {
 } T_Mes;
 
 #endif // GLOBAL_H
+
+

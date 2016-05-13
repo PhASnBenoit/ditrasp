@@ -29,6 +29,7 @@ CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, un
 
 CCapteurI2cHtu21d_HumTemp::~CCapteurI2cHtu21d_HumTemp()
 {
+    stop();
     mI2c->freeInstance();
     mShm->detach();
     delete mShm;
@@ -39,6 +40,7 @@ void CCapteurI2cHtu21d_HumTemp::run()
     float mesureHum, mesureTemp;
 
     mArret=false;
+    mStopped=false;
     while(!mArret) {
         // écriture de la mesure dans le segment de mémoire partagé
         mesureHum = lireMesureHum();
@@ -52,11 +54,14 @@ void CCapteurI2cHtu21d_HumTemp::run()
         mShm->unlock(); // on libère la mémmoire partagée
         sleep(1); // lecture toutes les s
     } // while
+    mStopped=true;
+    //exec();
 }
 
 void CCapteurI2cHtu21d_HumTemp::stop()
 {
     mArret=true;
+    while (!mStopped);
 }
 
 float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
@@ -76,7 +81,7 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureHum()
     unsigned char LSB = lecture[1];
     hum = -6+125*(MSB*256+LSB)/65536;
     sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Hum:%3.1f",res, MSB, LSB, hum);
-    qDebug() << aff;
+//    qDebug() << aff;
     return hum;
 } // lireMesHum
 
@@ -97,6 +102,6 @@ float CCapteurI2cHtu21d_HumTemp::lireMesureTemp()
     unsigned char LSB = lecture[1];
     temp = -46.85+175.72*(MSB*256+LSB)/65536;
     sprintf(aff,"CCapteurI2cHtu21d_HumTemp res=%d msb=%02X lsb=%02X Temp:%3.1f",res, MSB, LSB, temp);
-    qDebug() << aff;
+//    qDebug() << aff;
     return temp;
 } // lire MesTemp
