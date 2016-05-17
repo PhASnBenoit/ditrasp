@@ -69,17 +69,17 @@ int CCommuniquer::initPs(QSerialPort *serial)
     return 1;
 }  // destructeur
 
-int CCommuniquer::protocole(QByteArray &qbaTrame, int lgTrame)
+int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
 {
     US crcRecu, crcCalc;  // stockage des CRC recu et calculé
     T_MessIntTimer it;
-    int lgCorps = lgTrame-9;
+    int lgCorps = lgTrame-10;
 
     qDebug() << "CCommuniquer::protocole: qba=" << qbaTrame;
     if (qbaTrame.at(3) == ']') {  // si la syntaxe de fin est respectée
         switch (qbaTrame.at(1)) {
         case '0':                   // PREMIER DIGIT A 0
-            switch (qbaTrame.at(2)) { // deuxiéme digit
+            switch (qbaTrame.at(2)) { // deuxième digit
             case '0':               // START MISSION
                 emit afficherTexte("START MISSION");
                 if (mEtat != PENDANT_MISSION)
@@ -89,12 +89,13 @@ int CCommuniquer::protocole(QByteArray &qbaTrame, int lgTrame)
                 if (mEtat != PENDANT_MISSION)
                     return -1;
                 emit afficherTexte("START ACQUISITION");
-                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-5,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
                 qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     // enregistrer nouveau timer
                     mTimerMesures = qbaTrame.mid(4, lgCorps).toInt();
+                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
                     // lance timer incrustation et envoi mesure si option choisie
                     mTimer->stop();   // normalement inutile
                     mTimer->setInterval(mTimerMesures);  // timer envoi mesures
@@ -132,7 +133,7 @@ int CCommuniquer::protocole(QByteArray &qbaTrame, int lgTrame)
                 if (mEtat != PENDANT_MISSION)
                     return -1;
                 emit afficherTexte("ORDRE CAMERA");
-                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-5,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
                 qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
@@ -155,11 +156,12 @@ int CCommuniquer::protocole(QByteArray &qbaTrame, int lgTrame)
                 if (mEtat != PENDANT_MISSION)
                     return -1;
                 emit afficherTexte("MODIF INTERVAL INCRUSTATION");
-                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-5,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
                 qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     mTimerMesures = qbaTrame.mid(4,lgCorps).toInt();
+                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
                     it.interval = mTimerMesures;
                     it.enable=true;
                     mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
@@ -208,30 +210,35 @@ int CCommuniquer::protocole(QByteArray &qbaTrame, int lgTrame)
 
 void CCommuniquer::onReadyRead()
 {
-    qDebug() << "CCommuniquer::onReadyRead";
-    QByteArray car,
-               trame;
+    QByteArray car;
+
     while (mPs->bytesAvailable()) {
+//        qDebug() << "CCommuniquer::onReadyRead: bytes available";
         car = mPs->read(1); // lecture d'un caractère
         switch (mEtatData) {
         case RECH_DEBUT_TRAME:
             if (car.at(0) == '[') {
                 mEtatData = SAUVE_TRAME;
-                trame.append('[');
+                mTrame.clear();
+                mTrame.append('[');
             } // if car
             break;
         case SAUVE_TRAME:
             if (car.at(0) == CARFIN) {  // fin de trame
-                int res=protocole(trame, trame.size());
+                mTrame.append('!');
+                qDebug() << "CCommuniquer::onReadyRead: trame finie = " << mTrame;
+                int res=protocole(mTrame, mTrame.size());
                 //envoi de l'acquittement si tout va bien
                 if (res>0) {
-                    mPs->write("[AA]");
+                    mPs->write("[AA]!");
                     qDebug() << "CCommuniquer::onReadyRead: ACK envoyé";
                 } // if res
                 mEtatData = RECH_DEBUT_TRAME;
             } // if CARFIN
-            else
-                trame.append(car);
+            else {
+                mTrame.append(car);
+//                qDebug() << "CCommuniquer::onReadyRead: trame en cours = " << mTrame;
+            } // else
             break;
         default:
             qDebug() << "CCommuniquer::onReadyRead: Pb état réception.";

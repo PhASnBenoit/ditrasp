@@ -27,6 +27,11 @@ typedef enum {
     SAUVE_TRAME
 } T_ETAT_COMM_DATA;
 
+typedef struct {
+    char nomMission[50];
+    bool emMesVersGcs;
+} T_DATACONFIG;
+
 class CCommuniquer : public QObject
 {
     Q_OBJECT
@@ -46,10 +51,12 @@ private:
     int mTimerMesures;
     T_ETAT_SYSTEM mEtat;  // 0 avant mission    1 pendant mission     2 après mission
     T_ETAT_COMM_DATA mEtatData;  // gestion de la réception de car data
-    QByteArray trame;  // permet de recevoir la trame de la liaison data
+    T_DATACONFIG mDc;  // données initiale de configuration mission
+    QByteArray mTrame;
+
 
     int initPs(QSerialPort *serial);
-    int protocole(QByteArray &qbaTrame, int lgTrame);
+    int protocole(QByteArray qbaTrame, int lgTrame);
     US crc16(UC *tab, int nb);
     US retrouveCrc(QByteArray qbaCrc);
 

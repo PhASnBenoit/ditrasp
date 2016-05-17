@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QList<T_Mes> mesures;
     T_Mes mes;
     QList<QByteArray> parties;
-    QFile file("config.ini");
+    QFile file("./config.ini");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
          qDebug("Erreur ouverture du fichier config.ini !");
     } // if fichier pas bon
