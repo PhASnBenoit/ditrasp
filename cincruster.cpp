@@ -117,8 +117,9 @@ void CIncruster::majAff()
 void CIncruster::onMessReady(long type)
 {
     int res;
+    T_MessIntTimer mess;
 
-//    qDebug("CIncruster:onMessReady: Un message est arrivé");
+    qDebug("CIncruster:onMessReady: Un message est arrivé");
     switch (type) {
     case TYPE_MESS_INCRUSTER:  // modification des paramètres à afficher
         qDebug("CIncruster:onMessReady: nouveaux params d'incrustation");
@@ -130,9 +131,8 @@ void CIncruster::onMessReady(long type)
         } // else
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
-        qDebug("CIncruster:onMessReady: nouveaux params timer");
-        T_MessIntTimer mess;
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
+        qDebug() << "CIncruster:onMessReady: nouveaux params timer : " << mess.enable;
         stop();
         mTimer->setInterval(mess.interval);
         if (mess.enable)

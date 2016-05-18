@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.6.1, 2016-05-14T00:17:33. -->
+<!-- Written by QtCreator 3.6.1, 2016-05-19T00:13:06. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -271,9 +271,9 @@
        <value type="QString">/home/philippe/devQt/build-ditRasp-RPI_Jessie-Debug/ditRasp</value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedHosts">
+       <value type="QString">192.168.2.222</value>
        <value type="QString">192.168.2.167</value>
        <value type="QString">192.168.1.38</value>
-       <value type="QString">192.168.2.222</value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedRemotePaths">
        <value type="QString">/home/pi</value>
@@ -286,9 +286,9 @@
        <value type="QString">/home/philippe/jessie/sysroot</value>
       </valuelist>
       <valuelist type="QVariantList" key="Qt4ProjectManager.MaemoRunConfiguration.LastDeployedTimes">
+       <value type="QDateTime">2016-05-02T17:14:52</value>
        <value type="QDateTime">2016-05-13T15:56:15</value>
        <value type="QDateTime">2016-04-04T15:34:35</value>
-       <value type="QDateTime">2016-05-02T17:14:52</value>
       </valuelist>
       <value type="bool" key="RemoteLinux.GenericDirectUploadStep.IgnoreMissingFiles">false</value>
       <value type="bool" key="RemoteLinux.GenericDirectUploadStep.Incremental">true</value>

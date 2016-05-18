@@ -48,6 +48,7 @@ private slots:
     void on_pbLireMessage_clicked();
     void onTimer();
     void onAfficherTexte(QString aff);
+    void onLancerThreads();
 
 signals:
     void arretThreadsCapteur();

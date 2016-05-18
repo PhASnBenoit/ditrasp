@@ -14,7 +14,8 @@
 #include <global.h>
 #include "cmsg.h"
 
-#define CARFIN '!'
+#define STX 0x02
+#define ETX 0x03
 
 typedef enum {
     AVANT_MISSION = 0,
@@ -62,6 +63,7 @@ private:
 
 signals:
     void afficherTexte(QString aff);
+    void lancerThreads();
 
 private slots:
     void onMessReady(long type);    // message dans la file
