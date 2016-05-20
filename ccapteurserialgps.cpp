@@ -32,12 +32,10 @@ void CCapteurSerialGps::run()
     while(!mArret) {
         lireMesure(latitude, longitude);
         mesure = "Lat:"+QString(latitude)+" Long:"+QString(longitude);
-        qDebug() << "GPS: " << mesure;
+//        qDebug() << "GPS: " << mesure;
         // sauvegarde dans la mémoire partagée
-        T_Mes *mess = (T_Mes *)mData;
-        while (mess->noMes != mNum) mess++;
         mShm->lock();
-          strncpy(mess->valMes, mesure.toStdString().c_str(), sizeof(mess->valMes));
+        strcpy(mData[mNum].valMes, mesure.toStdString().c_str());
         mShm->unlock();
     } // while
     mStopped = true;

@@ -14,6 +14,7 @@
 #include "ccapteuri2chtu21d_humtemp.h"
 #include "ccapteuri2chmc5883_comp.h"
 #include "ccapteurserialgps.h"
+#include "ccapteurgpioping_dist.h"
 #include "ccommuniquer.h"
 #include "ccontrolercamera.h"
 #include "cincruster.h"

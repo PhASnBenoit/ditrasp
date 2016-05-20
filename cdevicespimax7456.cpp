@@ -114,9 +114,11 @@ int CDeviceSpiMax7456::effaceEcran()
     int res;
     unsigned char reg=0;
     unsigned char com[2];
+    qDebug() << "CDeviceSpiMax7456::effaceEcran ";
     com[0]=DMM|READ;
     res=mSpi->ecrire(com,1);  // demande de lecture de DMM
     if (res != 1) qDebug() << "CDeviceSpiMax7456:effaceEcran:2: Pb Ecriture";
+    qDebug() << "CDeviceSpiMax7456::effaceEcran : Milieu";
     usleep(1000);
     res=mSpi->lire1octet(&reg);   // lecture de DMM
     if (res != 1) qDebug() << "CDeviceSpiMax7456:effaceEcran:1 Pb Lecture";
@@ -125,6 +127,7 @@ int CDeviceSpiMax7456::effaceEcran()
     usleep(1000);
     res=mSpi->ecrire(com,2);
     if (res != 2) qDebug() << "CDeviceSpiMax7456:effaceEcran:2: Pb Ecriture";
-    usleep(100);  // temps d'effacement typiquement 20us
+    usleep(1000);  // temps d'effacement typiquement 20us
+    qDebug() << "CDeviceSpiMax7456::effaceEcran : Sortie";
     return 1;
 } // effaceEcran

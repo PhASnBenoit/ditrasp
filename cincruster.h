@@ -15,15 +15,7 @@ typedef struct {
 } T_Aff;
 
 typedef struct {
-    T_Aff hg; // haut gauche
-    T_Aff hm;  //    milieu
-    T_Aff hd;  // droite
-    T_Aff mg; // milieu
-    T_Aff mm;
-    T_Aff md;
-    T_Aff bg; // bas
-    T_Aff bm;
-    T_Aff bd;
+    T_Aff c[9];  // val et pos d'incrustation
 } T_AffInc;
 
 class CIncruster : public QObject

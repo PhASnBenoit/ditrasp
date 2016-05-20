@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mCCom = new CCommuniquer(this, mMsg);
     connect(mMsg, SIGNAL(mailReady(long)), mCCom, SLOT(onMessReady(long)));
     connect(mCCom, SIGNAL(afficherTexte(QString)), this, SLOT(onAfficherTexte(QString)));
+    connect(mCCom, SIGNAL(lancerThreads()), this, SLOT(onLancerThreads()));
 /*
     // lecture du fichier de configuration config.ini qui identifie les capteurs présents sur le drone
     QList<T_Mes> mesures;
@@ -164,6 +165,14 @@ void MainWindow::onLancerThreads()
             inconnu = false;                           // la mesure est connue
             mNbMesure++;
         } // if 5883
+        if (!strncmp(data->nomClasse, "CCapteurGpioPing_Dist", sizeof("CCapteurGpioPing_Dist"))) {
+            qDebug("Capteur de distance reconnu !");
+            mCapteurs.append(new CCapteurGpioPing_Dist(this, data->noMes, data->adrCapteur));  // le thread est créé mais n'est pas lancé
+            connect(this, SIGNAL(arretThreadsCapteur()), (CCapteurGpioPing_Dist *)mCapteurs.at(i), SLOT(stop()));
+            mCapteurs.at(i)->start();                   // lancement du thread
+            inconnu = false;                           // la mesure est connue
+            mNbMesure++;
+        } // if Ping
         if (!strncmp(data->nomClasse, "CCapteurSerialGps", sizeof("CCapteurSerialGps"))) {
             qDebug("Capteur GPS reconnu !");
             mCapteurs.append(new CCapteurSerialGps(this, "/dev/ttyAMA0", data->noMes, 9600, 'N', 8));  // le thread est créé mais n'est pas lancé

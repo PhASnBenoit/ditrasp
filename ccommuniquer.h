@@ -9,6 +9,7 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QFile>
+#include <QProcess>
 #include <stdio.h>
 #include <unistd.h>
 #include <global.h>

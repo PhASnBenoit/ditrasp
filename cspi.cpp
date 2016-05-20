@@ -6,6 +6,7 @@ CSpi::CSpi(QObject *parent, char noCs, int speed) :
     mNoCe = noCs;   // chip select
     mSpeed = speed;
     init();
+    qDebug() << "Démarrage de l'objet CSpi";
 } // constructeur
 
 /////////////////////////////////////////////////////////////////

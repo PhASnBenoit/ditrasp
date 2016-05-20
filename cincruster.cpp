@@ -5,43 +5,30 @@ CIncruster::CIncruster(QObject *parent, CMsg *msg, int interval) :
 {
     qDebug("CIncruster démarre !");
 
-    // init des positions d'affichage
-    // améliorer en mettant les positions dans un fichier
-    mAffInc.hg.c=1; mAffInc.hg.r=1;  // ligne du haut
-    mAffInc.hm.c=10; mAffInc.hm.r=1;
-    mAffInc.hd.c=20; mAffInc.hd.r=1;
-
-    mAffInc.mg.c=1; mAffInc.mg.r=8;    // ligne du milieu
-    mAffInc.mm.c=10; mAffInc.mm.r=8;
-    mAffInc.md.c=20; mAffInc.md.r=8;
-
-    mAffInc.bg.c=1; mAffInc.bg.r=15;   // ligne du bas
-    mAffInc.bm.c=10; mAffInc.bm.r=15;
-    mAffInc.bd.c=20; mAffInc.bd.r=15;
-
     // instanciation du composant d'incrustation
     mMax = new CDeviceSpiMax7456(this, '1', 250000);
 
-    // attachement au segment de mémoire partagé pour les mesures instantanées
+    // attachement au segment de mémoire partagé des mesures instantanées
+    mNbCapteur=0;
     mShm = new QSharedMemory(KEY, this);  // pointeur vers l'objet mémoire partagé
     if (!mShm->attach())
         qDebug(mShm->errorString().toStdString().c_str());
-    mNbCapteur=mShm->size()/sizeof(T_Mes);  // nombre de mesures disponibles sur le drone
-    qDebug() << "CIncruster: " << mNbCapteur << "capteurs vus." << mShm->size() << "/" << sizeof(T_Mes);
     mData = (T_Mes *)mShm->constData(); // obtient le pointeur sur la mémoire
+    for(int i=0 ; i<NBMAXCAPT ; i++) {
+        if (strlen(mData[i].nomClasse)>0) { // capteur existant
+                mNbCapteur++;
+                mAffInc.c[i].r = mData[i].posL;
+                mAffInc.c[i].c = mData[i].posC;
+                mMessInc.c[i] = mData[i].noMes; // autorisation d'incrustation
+        } // if capteur existant
+        else {
+            mMessInc.c[i] = -1;
+        } // else
+    } // for
+    qDebug() << "CIncruster: " << mNbCapteur << "capteurs vus.";
 
     // lien vers la file de messages
     mMsg =msg;
-
-    // initialisation de l'incrustation
-    razAff();
-    // au départ, si pas de message, on construit un message demandant l'incrustation
-    // de toutes les mesures des capteurs présents !!!
-    int *pNoMes = &mMessInc.hg;  // pointe sur la première position dans la structure du message
-    for(int i=0 ; i<mNbCapteur ; i++) {
-        pNoMes[mData[i].noMes] = mData[i].noMes;
-        qDebug() << "CIncruster: i=" << i << " MessInc=" << pNoMes[mData[i].noMes] << "noMes=" << mData[i].noMes;
-    } // for
 
     // envoi du message pour mise à jour de l'affichage
     mMsg->sendMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // engendre un signal
@@ -79,34 +66,31 @@ void CIncruster::stop()
 
 void CIncruster::razAff()
 {
-    int *pNoMes = &mMessInc.hg;
     for (int i=0 ; i<NBMAXCAPT ; i++) {
-        *pNoMes++=-1;  // init de tout l'affichage à -1 donc pas d'affichage
+        mMessInc.c[i] = -1;  // init de tout l'affichage à -1 donc pas d'affichage
     } // for
 } // razAff
 
 void CIncruster::majAff()
 {
-    T_Mes *mess;
-    int *pI = &mMessInc.hg;  // pointe sur les mesures autorisées
-    T_Aff *pA = &mAffInc.hg;  // pointe sur la structure d'incrustation
+    int *pI = mMessInc.c;  // pointe sur les mesures autorisées
+    T_Aff *pA = mAffInc.c;  // pointe sur la structure d'incrustation
 
+    qDebug() << "CIncruster::majAff";
     // modifier les valeurs d'incrustation
     static bool flag=true;
     for (int i=0 ; i<NBMAXCAPT ; i++) { // pour tous les capteurs dans le message
         (flag==true?flag=false:flag=true);
         if (*pI != -1) {
-            mess = (T_Mes *)mData;
-            while(mess->noMes != *pI) mess++;
             mShm->lock();
-            strcpy(pA->texte, mess->valMes);  // accès à la mémoire partagée
-            strcat(pA->texte, mess->symbUnit);
+            strcpy(pA->texte, mData[i].valMes);  // accès à la mémoire partagée
+            strcat(pA->texte, mData[i].symbUnit);
             if (flag)
                 strcat(pA->texte, "     ");
             else
                 strcat(pA->texte, "  @  ");
             mShm->unlock();
-//            qDebug() << "--CIncruster:majAff:pI=" << *pI << " pA=" << pA->texte << " mess.noMes=" << mess->noMes;
+            qDebug() << "--CIncruster:majAff:pI=" << *pI << " pA=" << pA->texte << " noMes=" << mData[i].noMes;
             mMax->printRC(pA->texte, pA->r, pA->c);
         } // if *pI
         pA++;  // pointe sur le champs suivant de la structure d'affichage
@@ -126,13 +110,10 @@ void CIncruster::onMessReady(long type)
         res =  mMsg->getMessage(TYPE_MESS_INCRUSTER, &mMessInc, sizeof(T_MessInc));  // lecture du message arrivé
         if (res < 0)
            qDebug() << "CIncruster:onMessReady: Erreur extraction du message !";
-        else {
-            // traiter les nouveaux params à incruster
-        } // else
         break;
     case TYPE_MESS_TIMERINC: // modif de l'interval de raffraichissement
         res =  mMsg->getMessage(TYPE_MESS_TIMERINC, &mess, sizeof(T_MessIntTimer));  // lecture du message arrivé
-        qDebug() << "CIncruster:onMessReady: nouveaux params timer : " << mess.enable;
+        qDebug() << "CIncruster:onMessReady: nouveaux params timer : " << mess.interval;
         stop();
         mTimer->setInterval(mess.interval);
         if (mess.enable)

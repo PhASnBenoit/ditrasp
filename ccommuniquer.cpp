@@ -84,6 +84,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 emit afficherTexte("START MISSION");
                 if (mEtat != PENDANT_MISSION)
                     mEtat = PENDANT_MISSION;
+                emit lancerThreads();
                 break;
             case '1': // START ACQUISITION MESURE ET INCRUSTATION ET ENVOI
                 if (mEtat != PENDANT_MISSION)
@@ -95,7 +96,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 if (crcCalc == crcRecu) {
                     // enregistrer nouveau timer
                     mTimerMesures = qbaTrame.mid(4, lgCorps).toInt();
-                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
+//                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
                     // lance timer incrustation et envoi mesure si option choisie
                     mTimer->setInterval(mTimerMesures);  // timer envoi mesures
                     if (mDc.emMesVersGcs) {
@@ -128,7 +129,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 emit afficherTexte("PARAMS CONFIG AVANT MISSION");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     strncpy(mDc.nomMission, qbaTrame.mid(4,lgCorps-2).toStdString().c_str(),lgCorps-2);
                     mDc.nomMission[lgCorps-2]=0;  // fin de chaine
@@ -137,7 +138,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                     else
                         mDc.emMesVersGcs = false;
                 } else {    // if crc ok
-                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [5]";
+                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [3]";
                     return -1;
                 } // else crc pas bon
                 break;
@@ -145,29 +146,33 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 if (mEtat != AVANT_MISSION)
                     return -1;
                 emit afficherTexte("PARAMS CAPTEURS AVANT MISSION");
+                qDebug() << "CCommuniquer::protocole: PARAMS CAPTEUR DEPART MISSION";
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
                 qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     QList<QByteArray> parties;  // pour obtenir les datas seuls
                     QList<QByteArray> capts;  // pour séparer les données capteurs
-                    parties = qbaTrame.mid(4,lgCorps).split(']');
+                    parties = qbaTrame.mid(0,lgCorps).split(']');
+                    qDebug() << "CCommuniquer::protocole: partie 1: " << parties.at(1);
                     capts = parties.at(1).split('@');
                     bzero(mData, 9*sizeof(T_Mes));  // init à zero de la shm
                     for (int i=0 ; i<capts.size() ; i++) {
                         QList<QByteArray> elemts;  // pour séparer les élements de description d'un capteur
                         elemts = capts.at(i).split(';');
-                        mData[elemts.at(0).toInt()].noMes = elemts.at(0).toInt();
-                        mData[elemts.at(0).toInt()].adrCapteur = elemts.at(1).toInt(NULL, 16);  // hexadécimal
-                        mData[elemts.at(0).toInt()].posL = elemts.at(2).toInt();  //
-                        mData[elemts.at(0).toInt()].posC = elemts.at(3).toInt(NULL, 16);  //
-                        strncpy(mData[elemts.at(0).toInt()].nomClasse, elemts.at(4).toStdString().c_str(), sizeof(elemts.at(4)));
-                        strncpy(mData[elemts.at(0).toInt()].nomMes, elemts.at(5).toStdString().c_str(), sizeof(elemts.at(5)));
-                        strncpy(mData[elemts.at(0).toInt()].symbUnit, elemts.at(6).toStdString().c_str(), sizeof(elemts.at(6)));
-                        strncpy(mData[elemts.at(0).toInt()].valMes, elemts.at(7).toStdString().c_str(), sizeof(elemts.at(7)));
+                        int noCapt = elemts.at(0).toInt();
+                        qDebug() << "CCommuniquer::protocole: capteur : " << capts.at(i);
+                        mData[noCapt].noMes = elemts.at(0).toInt();
+                        mData[noCapt].adrCapteur = elemts.at(1).toInt(NULL, 16);  // hexadécimal
+                        mData[noCapt].posL = elemts.at(2).toInt();  //
+                        mData[noCapt].posC = elemts.at(3).toInt(NULL, 16);  //
+                        sprintf(mData[noCapt].nomClasse, "%s", elemts.at(4).toStdString().c_str());
+                        sprintf(mData[noCapt].nomMes, "%s", elemts.at(5).toStdString().c_str());
+                        sprintf(mData[noCapt].symbUnit, "%s", elemts.at(6).toStdString().c_str());
+                        sprintf(mData[noCapt].valMes, "%s", elemts.at(7).toStdString().c_str());
                     } // for i
                 } else {    // if crc ok
-                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [5]";
+                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [4]";
                     return -1;
                 } // else crc pas bon
                 emit lancerThreads();  // lance les threads capteurs
@@ -178,7 +183,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 emit afficherTexte("ORDRE CAMERA");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     // envoi message vers camera
                     T_MessOrdre ordre;
@@ -201,7 +206,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 emit afficherTexte("MODIF INTERVAL INCRUSTATION");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     mTimerMesures = qbaTrame.mid(4,lgCorps).toInt();
                     qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
@@ -213,7 +218,29 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                     return -1;
                 } // else crc pas bon
                 break;
-            default: // Réception inconnue
+            case '9': // MET A JOUR LA DATE / HEURE DE LA RPI
+                if (mEtat != AVANT_MISSION)
+                    return -1;
+                emit afficherTexte("MISE A JOUR DE LA DATE/HEURE");
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
+//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                if (crcCalc == crcRecu) {
+                    QList<QByteArray> dt;
+                    QProcess proc;
+                    QString command = "sudo date";
+                    QStringList arg;
+                    dt = qbaTrame.mid(4,lgCorps).split(';');
+//                    QString theDate = QString(dt.at(0))+QString(dt.at(1))+QString(dt.at(2));
+                    QString theTime = QString(dt.at(3))+QString(dt.at(4))+QString(dt.at(5));
+                    arg << theTime;
+                    proc.start(command, arg);
+                    sleep(2);
+                } else {    // if crc ok
+                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [9]";
+                    return -1;
+                } // else crc pas bon
+                break;            default: // Réception inconnue
                 qDebug() << "CCommuniquer:protocole: Réception d'un ordre inconnu";
                 return -1;
             } // sw digit2

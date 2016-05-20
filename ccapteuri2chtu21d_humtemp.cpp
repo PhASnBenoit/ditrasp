@@ -1,6 +1,7 @@
 #include "ccapteuri2chtu21d_humtemp.h"
 
-CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, unsigned char addr)
+CCapteurI2cHtu21d_HumTemp::CCapteurI2cHtu21d_HumTemp(QObject *parent, int no, unsigned char addr) :
+    QThread(parent)
 {
     int res;
 
@@ -48,15 +49,12 @@ void CCapteurI2cHtu21d_HumTemp::run()
         char chMes[30];
         sprintf(chMes,"Hum:%3.1f Temp:%3.1f",mesureHum, mesureTemp);
         mShm->lock(); // on prend la mémoire partagée
-        T_Mes *mess = (T_Mes *)mData;
-        while (mess->noMes != mNum) mess++;
-        strcpy(mess->valMes,chMes);  // écriture dans la mémoire partagée
+        strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
         sleep(1); // lecture toutes les s
     } // while
     mStopped=true;
-    //exec();
-}
+} // run
 
 void CCapteurI2cHtu21d_HumTemp::stop()
 {

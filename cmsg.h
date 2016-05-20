@@ -28,18 +28,11 @@ typedef struct {
     U_Mess corps;
 } T_MessMes;
 
-// type de message pour définir les mesures à incruster
+// type de message pour autoriser les mesures à incruster
+// -1 si pas d'incrustation de la mesure
 typedef struct {
     long type;
-    int hg;  // haut gauche
-    int hc;  // centre
-    int hd;  // droit
-    int mg;  // milieu
-    int mc;
-    int md;
-    int bg;  // bas
-    int bc;
-    int bd;
+    int c[9];  // nO du capteur à incruster
 } T_MessInc;
 
 // type pour un ordre

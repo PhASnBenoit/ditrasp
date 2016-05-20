@@ -56,9 +56,7 @@ void CCapteurI2cHmc5883_Comp::run()
         sprintf(chMes,"Angle:%3.1f",declinz);
 //        qDebug() << "CCapteurI2cHmc5883_Comp, run angle : " << chMes;
         mShm->lock(); // on réserve la mémoire partagée
-        T_Mes *mess = (T_Mes *)mData;
-        while (mess->noMes != mNum) mess++;
-        strcpy(mess->valMes,chMes);  // écriture dans la mémoire partagée
+        strcpy(mData[mNum].valMes,chMes);  // écriture dans la mémoire partagée
         mShm->unlock(); // on libère la mémmoire partagée
         usleep(250000);
     } // while
