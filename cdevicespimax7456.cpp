@@ -68,7 +68,8 @@ int CDeviceSpiMax7456::printRC(char *mes, int r, int c)
         (dispMemAddr>0xFF)?reg=0x01:reg=0x00;  // MSB à 1 si adresse affichage dépasse 255
         com[0]=DMAH; com[1]=reg;
         res=mSpi->ecrire(com,2); // MSB de la position d'affichage
-        if (res != 2) qDebug() << "CDeviceSpiMax7456:printRC:2: Pb Ecriture";
+        if (res != 2
+                ) qDebug() << "CDeviceSpiMax7456:printRC:2: Pb Ecriture";
         usleep(1000);
 
         com[0]=DMAL; com[1] = (unsigned char)(dispMemAddr&OCTET_BAS); // partie basse de l'adresse

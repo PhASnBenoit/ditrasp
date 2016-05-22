@@ -7,6 +7,9 @@
 #include "global.h"
 #include "cgpio.h"
 
+// TIMOUT = 20ms
+#define TIMEOUT 0.02 // timeout d'echo du capteur
+
 class CCapteurGpioPing_Dist : public QThread
 {
     Q_OBJECT

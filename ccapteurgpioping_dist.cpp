@@ -46,7 +46,10 @@ void CCapteurGpioPing_Dist::stop()
 
 int CCapteurGpioPing_Dist::getDistance()
 {
-    clock_t t1,t2;
+    // TIMOUT = 20ms
+	#define TIMEOUT 0.02
+	
+	clock_t t0,t1,t2;
     // Attendre avant la prochaine mesure
     mGpio->ecrire(0);
     usleep(500);
@@ -54,19 +57,24 @@ int CCapteurGpioPing_Dist::getDistance()
     mGpio->ecrire(1);
     usleep(10);
     mGpio->ecrire(0);
-
+	
     // Attendre le passage a 1 de l'echo
-    while(mGpio->lire()==0) ;
+	t0=clock();
+    while(mGpio->lire()==0)
+	{
+		// Pas de passage à 1 avant le timeout
+		if((clock() - t0)/CLOCKS_PER_SEC < TIMEOUT) return -1;
+	}
     t1=clock();
 
-    // Attendre le retour à 0 de l'echo
-    while(mGpio->lire()==1) ;
+    // Attendre le retour à 0 de l'echo ou la fin du timeout
+    while(mGpio->lire()==1 && (clock() - t1)/CLOCKS_PER_SEC < TIMEOUT); 
     t2=clock();
 
-    // Calclu de la duree aller-retour
-    unsigned long duration = (((unsigned long)t2)-((unsigned long)t1));
-    // Calcul de la distance
-    float distance=duration*34/2000;
+    // Calclu de la duree aller-retour (CLOCKS_PER_SEC : nb de tick/s)
+    unsigned long duration = (((unsigned long)t2)-((unsigned long)t1))/CLOCKS_PER_SEC;
+    // Calcul de la distance (340 m/s trajet aller-retour)
+    float distance=duration*34000/2;
 
     return distance;
 } // getdistance
