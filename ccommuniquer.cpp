@@ -78,7 +78,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
     qDebug() << "CCommuniquer::protocole: qba=" << qbaTrame;
     if (qbaTrame.at(3) == ']') {  // si la syntaxe de fin est respectée
         switch (qbaTrame.at(1)) {
-        case '0':                   // PREMIER DIGIT A 0
+        case '0':       /////////////  AVANT MISSION ///////////////////
             switch (qbaTrame.at(2)) { // deuxième digit
             case '0':               // START MISSION
                 emit afficherTexte("START MISSION");
@@ -86,50 +86,14 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                     mEtat = PENDANT_MISSION;
                 emit lancerThreads();
                 break;
-            case '1': // START ACQUISITION MESURE ET INCRUSTATION ET ENVOI
-                if (mEtat != PENDANT_MISSION)
-                    return -1;
-                emit afficherTexte("START ACQUISITION");
-                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
-                crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
-                if (crcCalc == crcRecu) {
-                    // enregistrer nouveau timer
-                    mTimerMesures = qbaTrame.mid(4, lgCorps).toInt();
-//                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
-                    // lance timer incrustation et envoi mesure si option choisie
-                    mTimer->setInterval(mTimerMesures);  // timer envoi mesures
-                    if (mDc.emMesVersGcs) {
-                       mTimer->start();  // pour le moment envoi obligatoire
-                       qDebug() << "CCommuniquer::protocole: transmission des mesures à la GCS";
-                    } else // if emVersGcs
-                        mTimer->stop();   // normalement inutile car au début le timer est toujours arrêté
-                    // envoi message cincruster pour modif timer
-                    it.interval = mTimerMesures;
-                    it.enable=true;
-                    mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
-                } else {    // else crc pas ok
-                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [1]";
-                    return -1;
-                } // else crc pas bon
-                break;
-            case '2': // STOP ACQUISITION
-                if (mEtat != PENDANT_MISSION)
-                    return -1;
-                emit afficherTexte("STOP ACQUISITION");
-                mTimer->stop();
-                // message vers incrustation
-                it.interval = mTimerMesures;
-                it.enable=false;
-                mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
-                break;
+
             case '3': // RECEPTION PARAMS CONFIG MISSION
                 if (mEtat != AVANT_MISSION)
                     return -1;
                 emit afficherTexte("PARAMS CONFIG AVANT MISSION");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                //                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     strncpy(mDc.nomMission, qbaTrame.mid(4,lgCorps-2).toStdString().c_str(),lgCorps-2);
                     mDc.nomMission[lgCorps-2]=0;  // fin de chaine
@@ -177,13 +141,87 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 } // else crc pas bon
                 emit lancerThreads();  // lance les threads capteurs
                 break;
+            case '9': // MET A JOUR LA DATE / HEURE DE LA RPI
+                if (mEtat != AVANT_MISSION)
+                    return -1;
+                emit afficherTexte("MISE A JOUR DE LA DATE/HEURE");
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
+                //                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                if (crcCalc == crcRecu) {
+                    QList<QByteArray> dt;
+                    QProcess proc;
+                    QString command = "sudo date";
+                    QStringList arg;
+                    dt = qbaTrame.mid(4,lgCorps).split(';');
+                    //                    QString theDate = QString(dt.at(0))+QString(dt.at(1))+QString(dt.at(2));
+                    QString theTime = QString(dt.at(3))+QString(dt.at(4))+QString(dt.at(5));
+                    arg << theTime;
+                    proc.start(command, arg);
+                    sleep(2);
+                } else {    // if crc ok
+                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [9]";
+                    return -1;
+                } // else crc pas bon
+                break;
+            case 'T': // TEST de COMMUNICATION AVEC GCS
+                qDebug() << "TEST RECU";
+                emit afficherTexte("TEST RECU");
+                // Rien à faire, juste renvoyer ACK
+                // quelque soit l'état on peut le faire.
+                break;
+            default: // Réception inconnue
+                qDebug() << "CCommuniquer:protocole: Réception d'un ordre inconnu";
+                return -1;
+                break;
+            } // sw pendant mission
+            break;
+        case '1':   //////////////// PENDANT MISSION ///////////////////////////
+            switch (qbaTrame.at(2)) { // deuxième digit
+            case '1': // START ACQUISITION MESURE ET INCRUSTATION ET ENVOI
+                if (mEtat != PENDANT_MISSION)
+                    return -1;
+                emit afficherTexte("START ACQUISITION");
+                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
+                crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
+                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                if (crcCalc == crcRecu) {
+                    // enregistrer nouveau timer
+                    mTimerMesures = qbaTrame.mid(4, lgCorps).toInt();
+                    //                    qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
+                    // lance timer incrustation et envoi mesure si option choisie
+                    mTimer->setInterval(mTimerMesures);  // timer envoi mesures
+                    if (mDc.emMesVersGcs) {
+                        mTimer->start();  // pour le moment envoi obligatoire
+                        qDebug() << "CCommuniquer::protocole: transmission des mesures à la GCS";
+                    } else // if emVersGcs
+                        mTimer->stop();   // normalement inutile car au début le timer est toujours arrêté
+                    // envoi message cincruster pour modif timer
+                    it.interval = mTimerMesures;
+                    it.enable=true;
+                    mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
+                } else {    // else crc pas ok
+                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [1]";
+                    return -1;
+                } // else crc pas bon
+                break;
+            case '2': // STOP ACQUISITION
+                if (mEtat != PENDANT_MISSION)
+                    return -1;
+                emit afficherTexte("STOP ACQUISITION");
+                mTimer->stop();
+                // message vers incrustation
+                it.interval = mTimerMesures;
+                it.enable=false;
+                mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
+                break;
             case '5': // ORDRE CAMERA
                 if (mEtat != PENDANT_MISSION)
                     return -1;
                 emit afficherTexte("ORDRE CAMERA");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                //                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     // envoi message vers camera
                     T_MessOrdre ordre;
@@ -206,7 +244,7 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                 emit afficherTexte("MODIF INTERVAL INCRUSTATION");
                 crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
                 crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
+                //                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
                 if (crcCalc == crcRecu) {
                     mTimerMesures = qbaTrame.mid(4,lgCorps).toInt();
                     qDebug() << "CCommuniquer::protocole: nouveau timer = " << mTimerMesures;
@@ -218,63 +256,35 @@ int CCommuniquer::protocole(QByteArray qbaTrame, int lgTrame)
                     return -1;
                 } // else crc pas bon
                 break;
-            case '9': // MET A JOUR LA DATE / HEURE DE LA RPI
-                if (mEtat != AVANT_MISSION)
-                    return -1;
-                emit afficherTexte("MISE A JOUR DE LA DATE/HEURE");
-                crcRecu = retrouveCrc(qbaTrame.mid(lgTrame-4,4));  // reconstitue crc reçu sur 16 bits
-                crcCalc = crc16((unsigned char *)qbaTrame.mid(4,lgCorps).toStdString().c_str(), lgCorps);
-//                qDebug() << "CCommuniquer::protocole: CRC Recu :" << crcRecu << " CRC Calc:" << crcCalc;
-                if (crcCalc == crcRecu) {
-                    QList<QByteArray> dt;
-                    QProcess proc;
-                    QString command = "sudo date";
-                    QStringList arg;
-                    dt = qbaTrame.mid(4,lgCorps).split(';');
-//                    QString theDate = QString(dt.at(0))+QString(dt.at(1))+QString(dt.at(2));
-                    QString theTime = QString(dt.at(3))+QString(dt.at(4))+QString(dt.at(5));
-                    arg << theTime;
-                    proc.start(command, arg);
-                    sleep(2);
-                } else {    // if crc ok
-                    qDebug() << "CCommuniquer::protocole: CRC Mauvais [9]";
-                    return -1;
-                } // else crc pas bon
-                break;            default: // Réception inconnue
+            case '9': // Ordre 99 STOP MISSION (un seul ordre commence par 9)
+                if (mEtat != PENDANT_MISSION)
+                    mEtat = APRES_MISSION;
+                emit afficherTexte("STOP MISSION");
+                mTimer->stop(); // stoppe l'envoi des mesures
+                // message vers incrustation
+                it.interval = mTimerMesures;
+                it.enable=false;    // stoppe l'incrustation
+                mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
+                break;
+            default: // NON RECONNU
                 qDebug() << "CCommuniquer:protocole: Réception d'un ordre inconnu";
                 return -1;
-            } // sw digit2
-            break;
-        case '9': // Ordre 99 STOP MISSION (un seul ordre commence par 9)
-            if (mEtat != PENDANT_MISSION)
-                mEtat = APRES_MISSION;
-            emit afficherTexte("STOP MISSION");
-            mTimer->stop(); // stoppe l'envoi des mesures
-            // message vers incrustation
-            it.interval = mTimerMesures;
-            it.enable=false;    // stoppe l'incrustation
-            mMsg->sendMessage(TYPE_MESS_TIMERINC,&it, sizeof(T_MessIntTimer));
-            break;
+                break;
+            } // sw pendant mission
         case 'A': // Acquittement de la GCS (Un seul ordre commence par A)
             emit afficherTexte("Acquittement !");
             // acquittement par la GCS
             return -1;   // évite l'ACK automatique
             break;
-        case 'T': // TEST de COMMUNICATION AVEC GCS
-            qDebug() << "TEST RECU";
-            emit afficherTexte("TEST RECU");
-            // Rien à faire, juste renvoyer ACK
-            // quelque soit l'état on peut le faire.
-            break;
         default: // NON RECONNU
             qDebug() << "CCommuniquer:protocole: Réception d'un ordre inconnu";
             return -1;
             break;
-        } // sw
-    } else {
-        qDebug() << "CCommuniquer: Défaut fin ']' ordre !";
-        return -1;
-    } // else ]
+    } // sw
+} else {
+qDebug() << "CCommuniquer: Défaut fin ']' ordre !";
+return -1;
+} // else ]
     return 1;
 } // protocole
 

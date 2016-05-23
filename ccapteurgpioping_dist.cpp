@@ -14,6 +14,7 @@ CCapteurGpioPing_Dist::CCapteurGpioPing_Dist(QObject *parent, int no, unsigned c
     mData = (T_Mes *)mShm->data(); // obtient le pointeur sur la mémoire
 
     qDebug("Démarrage du thread CCapteurGpioPing_Dist !");
+    qDebug() << CLOCKS_PER_SEC;
 
 } // constructeur
 
@@ -46,9 +47,6 @@ void CCapteurGpioPing_Dist::stop()
 
 int CCapteurGpioPing_Dist::getDistance()
 {
-    // TIMOUT = 20ms
-	#define TIMEOUT 0.02
-	
 	clock_t t0,t1,t2;
     // Attendre avant la prochaine mesure
     mGpio->ecrire(0);
@@ -62,13 +60,14 @@ int CCapteurGpioPing_Dist::getDistance()
 	t0=clock();
     while(mGpio->lire()==0)
 	{
-		// Pas de passage à 1 avant le timeout
-		if((clock() - t0)/CLOCKS_PER_SEC < TIMEOUT) return -1;
-	}
+/*		// Pas de passage à 1 avant le timeout
+        if( (clock()-t0) > (TIMEOUT*CLOCKS_PER_SEC) )
+            return -1;
+*/	}
     t1=clock();
 
     // Attendre le retour à 0 de l'echo ou la fin du timeout
-    while(mGpio->lire()==1 && (clock() - t1)/CLOCKS_PER_SEC < TIMEOUT); 
+    while( (mGpio->lire()==1) /*&& ((clock()-t1)<(TIMEOUT*CLOCKS_PER_SEC))*/ );
     t2=clock();
 
     // Calclu de la duree aller-retour (CLOCKS_PER_SEC : nb de tick/s)

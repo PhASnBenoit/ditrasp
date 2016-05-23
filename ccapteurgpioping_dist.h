@@ -9,6 +9,7 @@
 
 // TIMOUT = 20ms
 #define TIMEOUT 0.02 // timeout d'echo du capteur
+//#define CLOCKS_PER_SEC 1000000L
 
 class CCapteurGpioPing_Dist : public QThread
 {
